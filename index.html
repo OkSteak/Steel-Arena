@@ -23,7 +23,6 @@
         .font-orbitron {
             font-family: 'Orbitron', sans-serif;
         }
-        /* Custom scrollbar for shop and UI lists */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -38,7 +37,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(6, 182, 212, 0.8);
         }
-        /* Glowing effects */
         .glow-cyan {
             box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), inset 0 0 10px rgba(6, 182, 212, 0.2);
         }
@@ -54,7 +52,6 @@
         .text-glow-amber {
             text-shadow: 0 0 8px rgba(245, 158, 11, 0.8);
         }
-        /* HUD Grid background overlay */
         .bg-grid {
             background-size: 30px 30px;
             background-image: 
@@ -84,7 +81,7 @@
                 </div>
             </div>
 
-            <!-- Navigation Tabs: Armory vs Customization -->
+            <!-- Navigation Tabs -->
             <div class="flex items-center bg-slate-950 p-1 rounded-lg border border-slate-800">
                 <button id="tab-armory-btn" onclick="switchGarageTab('armory')" class="px-3 py-1.5 rounded text-xs font-orbitron font-bold bg-cyan-500 text-slate-950 transition-all">
                     <i class="fa-solid fa-gun mr-1"></i> ARMORY
@@ -110,7 +107,7 @@
             </div>
         </div>
 
-        <!-- Main Hangar Hub: Split into Loadout Slots & Weapon Shop / Customization -->
+        <!-- Main Hangar Hub -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 my-4 flex-1 overflow-y-auto pr-1">
             
             <!-- Left Panel: Mech Loadout Slots (4 Slots) -->
@@ -122,9 +119,8 @@
                     <span class="text-xs text-slate-500">Keys [1, 2, 3, 4] in battle</span>
                 </div>
 
-                <!-- 4 Weapon Slots -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="equipped-slots-container">
-                    <!-- Dynamically populated via JS -->
+                    <!-- Dynamically populated -->
                 </div>
 
                 <!-- Mech Specs Summary Box -->
@@ -159,9 +155,8 @@
                     <span class="text-xs text-slate-400">Select any owned weapon to equip to active slot</span>
                 </div>
 
-                <!-- Weapons Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto max-h-[380px] p-1" id="shop-weapons-grid">
-                    <!-- Dynamically populated via JS -->
+                    <!-- Dynamically populated -->
                 </div>
             </div>
 
@@ -175,40 +170,28 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[380px] p-1">
-                    <!-- Leg Chassis Selection -->
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2 sm:col-span-2">
                         <label class="text-xs font-orbitron font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-drumstick-bite text-amber-400"></i> Leg Chassis Architecture (Alters Stats & Visuals)
+                            <i class="fa-solid fa-drumstick-bite text-amber-400"></i> Leg Chassis Architecture
                         </label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="custom-leg-options">
-                            <!-- Populated via JS -->
-                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="custom-leg-options"></div>
                     </div>
 
-                    <!-- Core Expansion Abilities -->
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2 sm:col-span-2">
                         <label class="text-xs font-orbitron font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-burst text-rose-400"></i> Active Core Expansion System [KEY E]
                         </label>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="custom-ability-options">
-                            <!-- Populated via JS -->
-                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="custom-ability-options"></div>
                     </div>
 
-                    <!-- Primary Armor Color -->
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
                         <label class="text-xs font-orbitron font-bold text-cyan-400 uppercase tracking-wider">Primary Armor Paint</label>
-                        <div class="flex flex-wrap gap-2" id="custom-primary-colors">
-                            <!-- Populated via JS -->
-                        </div>
+                        <div class="flex flex-wrap gap-2" id="custom-primary-colors"></div>
                     </div>
 
-                    <!-- Accent / Secondary Trim Color -->
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
                         <label class="text-xs font-orbitron font-bold text-cyan-400 uppercase tracking-wider">Accent Trim Color</label>
-                        <div class="flex flex-wrap gap-2" id="custom-secondary-colors">
-                            <!-- Populated via JS -->
-                        </div>
+                        <div class="flex flex-wrap gap-2" id="custom-secondary-colors"></div>
                     </div>
                 </div>
             </div>
@@ -238,7 +221,6 @@
                 <button onclick="closeSaveModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
             </div>
 
-            <!-- Export Section -->
             <div class="flex flex-col gap-2">
                 <label class="text-xs font-orbitron font-bold text-slate-300">EXPORT SAVE CODE</label>
                 <div class="flex gap-2">
@@ -249,10 +231,9 @@
                 </div>
             </div>
 
-            <!-- Import Section -->
             <div class="flex flex-col gap-2 border-t border-slate-800 pt-3">
                 <label class="text-xs font-orbitron font-bold text-slate-300">IMPORT SAVE CODE</label>
-                <textarea id="import-code-input" rows="2" placeholder="Paste your alphanumeric save code string here..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"></textarea>
+                <textarea id="import-code-input" rows="2" placeholder="Paste save code here..." class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-cyan-500"></textarea>
                 <button onclick="handleImportCode()" class="w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-orbitron font-bold text-xs rounded transition-all">
                     LOAD DATA
                 </button>
@@ -263,14 +244,10 @@
 
     <!-- GAME HUD & CANVAS CONTAINER -->
     <div id="game-screen" class="relative w-full h-full flex-1 hidden">
-        
-        <!-- Game Canvas -->
         <canvas id="gameCanvas" class="w-full h-full bg-slate-950"></canvas>
 
         <!-- TOP HUD BAR -->
         <div class="absolute top-3 left-3 right-3 flex items-start justify-between pointer-events-none z-10">
-            
-            <!-- Left Top: Alive Counter & Kills -->
             <div class="flex flex-col gap-2">
                 <div class="bg-slate-900/90 border border-slate-700/80 backdrop-blur-md px-3 py-1.5 rounded-lg flex items-center gap-4 text-xs font-bold shadow-lg">
                     <div class="flex items-center gap-1.5 text-cyan-400">
@@ -286,30 +263,22 @@
                     </div>
                 </div>
 
-                <!-- Zone Warning Banner -->
                 <div id="hud-zone-warning" class="hidden bg-amber-500/20 border border-amber-500/60 backdrop-blur-md px-3 py-1 rounded-lg text-[11px] font-bold text-amber-300 flex items-center gap-2 animate-pulse">
                     <i class="fa-solid fa-radiation text-amber-400"></i>
                     <span id="hud-zone-timer">SAFE ZONE SHRINKING IN 15s</span>
                 </div>
             </div>
 
-            <!-- Kill Feed Notifications -->
-            <div id="hud-kill-feed" class="flex flex-col gap-1 items-end max-w-xs text-xs font-semibold">
-                <!-- Dynamic kill messages -->
-            </div>
+            <div id="hud-kill-feed" class="flex flex-col gap-1 items-end max-w-xs text-xs font-semibold"></div>
 
-            <!-- Minimap Container -->
             <div class="relative bg-slate-900/90 border border-cyan-500/40 rounded-lg p-1 backdrop-blur-md shadow-lg pointer-events-auto">
                 <canvas id="minimapCanvas" width="110" height="110" class="rounded bg-slate-950/80"></canvas>
             </div>
         </div>
 
-        <!-- BOTTOM HUD BAR: AP / EN / WEAPONS -->
+        <!-- BOTTOM HUD BAR -->
         <div class="absolute bottom-3 left-3 right-3 flex flex-col md:flex-row items-center justify-between gap-3 pointer-events-none z-10">
-            
-            <!-- Left: Armor & Energy Vitals -->
             <div class="w-full md:w-72 bg-slate-900/90 border border-slate-700/80 backdrop-blur-md p-3 rounded-xl shadow-lg pointer-events-auto flex flex-col gap-2">
-                <!-- AP Bar -->
                 <div>
                     <div class="flex justify-between text-xs font-bold mb-1">
                         <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield text-[10px]"></i> AP (ARMOR)</span>
@@ -320,7 +289,6 @@
                     </div>
                 </div>
 
-                <!-- Energy Bar -->
                 <div>
                     <div class="flex justify-between text-xs font-bold mb-1">
                         <span class="text-cyan-400 flex items-center gap-1"><i class="fa-solid fa-bolt text-[10px]"></i> EN (BOOST)</span>
@@ -332,21 +300,15 @@
                 </div>
             </div>
 
-            <!-- Center: Quick Slot Switches (1, 2, 3, 4) -->
-            <div class="flex items-center gap-2 pointer-events-auto overflow-x-auto max-w-full py-1" id="hud-weapon-slots">
-                <!-- Dynamically populated 4 weapon cards -->
-            </div>
+            <div class="flex items-center gap-2 pointer-events-auto overflow-x-auto max-w-full py-1" id="hud-weapon-slots"></div>
 
-            <!-- Right: Active Core Ability & Dash Buttons -->
             <div class="flex items-center gap-2 pointer-events-auto">
-                <!-- Core Ability Button -->
                 <button id="btn-ability" class="px-4 py-3 bg-slate-900/90 border border-amber-500/50 hover:bg-amber-500/20 text-amber-300 rounded-xl font-orbitron font-bold text-xs backdrop-blur-md flex flex-col items-center justify-center relative min-w-[100px]">
                     <i id="hud-ability-icon" class="fa-solid fa-burst text-base text-amber-400 mb-0.5"></i>
                     <span id="hud-ability-name" class="text-[10px]">CORE EXP (E)</span>
                     <span id="hud-ability-status" class="text-[9px] text-emerald-400 font-extrabold">READY</span>
                 </button>
 
-                <!-- Quick Boost Button -->
                 <button id="btn-dash" class="px-4 py-3 bg-slate-900/90 border border-cyan-500/50 hover:bg-cyan-500/20 text-cyan-300 rounded-xl font-orbitron font-bold text-xs backdrop-blur-md flex flex-col items-center justify-center">
                     <i class="fa-solid fa-angles-up text-base"></i>
                     <span class="text-[10px]">QUICK BOOST</span>
@@ -370,7 +332,6 @@
                 <p id="summary-subtitle" class="text-xs text-slate-400 uppercase tracking-widest mt-1">All enemy mechs neutralized in the zone</p>
             </div>
 
-            <!-- Stats Grid -->
             <div class="w-full grid grid-cols-3 gap-3 bg-slate-950/80 p-4 rounded-xl border border-slate-800 text-xs">
                 <div>
                     <div class="text-slate-500">FINAL RANK</div>
@@ -386,7 +347,6 @@
                 </div>
             </div>
 
-            <!-- Credit Reward Calculation Box -->
             <div class="w-full bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl flex items-center justify-between">
                 <div class="text-left">
                     <div class="text-xs text-amber-300/80 uppercase font-bold tracking-wider">Mission Bounty Payout</div>
@@ -397,7 +357,6 @@
                 </div>
             </div>
 
-            <!-- Return Button -->
             <button id="btn-return-hangar" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-orbitron font-black tracking-wider text-base rounded-xl transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-house-chimney-crack"></i> CLAIM & RETURN TO HANGAR
             </button>
@@ -721,6 +680,164 @@
                 color: '#3b82f6',
                 description: 'Fires 3 rapid heavy royal-blue laser lances with intense core glow and lens flares.',
                 unlocked: false
+            },
+
+            // ==========================================
+            // 10 NEW UNIQUE BALANCED WEAPONS
+            // ==========================================
+            singularity: {
+                id: 'singularity',
+                name: 'VOID SINGULARITY',
+                icon: 'fa-dharmachakra',
+                type: 'Gravitational Vortex',
+                price: 5500,
+                damage: 680,
+                splashRadius: 160,
+                fireRate: 1750,
+                range: 850,
+                speed: 10,
+                spread: 0.01,
+                color: '#a855f7',
+                description: 'Fires a swirling dark matter sphere that pulls nearby mechs inward into a crushing void blast.',
+                unlocked: false
+            },
+            acid_blaster: {
+                id: 'acid_blaster',
+                name: 'CORROSIVE ACID SPRAY',
+                icon: 'fa-vial-virus',
+                type: 'Bio-Chemical Melt',
+                price: 2400,
+                damage: 28,
+                fireRate: 50,
+                range: 400,
+                speed: 15,
+                spread: 0.25,
+                color: '#84cc16',
+                description: 'Launches continuous streams of caustic bio-acid that dissolve armor plating in a toxic mist.',
+                unlocked: false
+            },
+            cryo_beam: {
+                id: 'cryo_beam',
+                name: 'CRYO FROSTBEAM',
+                icon: 'fa-snowflake',
+                type: 'Sub-Zero Thermal',
+                price: 3100,
+                damage: 210,
+                fireRate: 400,
+                range: 750,
+                speed: 28,
+                spread: 0.02,
+                color: '#38bdf8',
+                description: 'Projects freeze-ray bolts leaving diamond snow trails that shatter into icy crystal shockwaves.',
+                unlocked: false
+            },
+            saw_launcher: {
+                id: 'saw_launcher',
+                name: 'ROTOR SAW CANNON',
+                icon: 'fa-compact-disc',
+                type: 'Kinetic Slicer',
+                price: 3800,
+                damage: 480,
+                fireRate: 850,
+                range: 650,
+                speed: 14,
+                spread: 0.05,
+                color: '#f97316',
+                description: 'Fires spinning high-frequency plasma saw blades that slice through multiple target frames.',
+                unlocked: false
+            },
+            orbital_strike: {
+                id: 'orbital_strike',
+                name: 'ORBITAL BEACON',
+                icon: 'fa-satellite',
+                type: 'Targeted Satellite',
+                price: 6000,
+                damage: 1200,
+                splashRadius: 180,
+                fireRate: 2400,
+                range: 900,
+                speed: 35,
+                spread: 0.001,
+                color: '#f43f5e',
+                description: 'Deploys a target laser flare calling down an intense orbital satellite beam from the heavens.',
+                unlocked: false
+            },
+            chain_lightning: {
+                id: 'chain_lightning',
+                name: 'CHAIN VOLT LEAPER',
+                icon: 'fa-bolt-lightning',
+                type: 'Tesla Leap Energy',
+                price: 4500,
+                damage: 380,
+                fireRate: 650,
+                range: 700,
+                speed: 32,
+                spread: 0.08,
+                color: '#06b6d4',
+                description: 'Fires high-voltage arcs that jump directly between adjacent enemy mechs upon impact.',
+                unlocked: false
+            },
+            napalm_mortar: {
+                id: 'napalm_mortar',
+                name: 'NAPALM MORTAR',
+                icon: 'fa-dumpster-fire',
+                type: 'Incendiary Carpet',
+                price: 4100,
+                damage: 340,
+                splashRadius: 140,
+                fireRate: 1500,
+                range: 780,
+                speed: 11,
+                spread: 0.08,
+                color: '#f59e0b',
+                description: 'Lobs heavy incendiary napalm shells that ignite fire pools, scorching wide combat zones.',
+                unlocked: false
+            },
+            needle_gun: {
+                id: 'needle_gun',
+                name: 'FLECHETTE STORM',
+                icon: 'fa-braille',
+                type: 'Hyper Flechette',
+                price: 2900,
+                damage: 45,
+                pellets: 6,
+                fireRate: 320,
+                range: 680,
+                speed: 38,
+                spread: 0.12,
+                color: '#cbd5e1',
+                description: 'Launches tight needle flechette bursts with pin-point precision and armor piercing speed.',
+                unlocked: false
+            },
+            quantum_disruptor: {
+                id: 'quantum_disruptor',
+                name: 'HELIX DISRUPTOR',
+                icon: 'fa-dna',
+                type: 'Phase Wave Quantum',
+                price: 5000,
+                damage: 420,
+                fireRate: 800,
+                range: 820,
+                speed: 18,
+                spread: 0.0,
+                color: '#d946ef',
+                description: 'Fires twin quantum phase projectiles that weave in a synchronized double-helix pattern.',
+                unlocked: false
+            },
+            seismic_cannon: {
+                id: 'seismic_cannon',
+                name: 'SEISMIC IMPACTOR',
+                icon: 'fa-mountain-sun',
+                type: 'Kinetic Shockwave',
+                price: 4700,
+                damage: 580,
+                fireRate: 1100,
+                range: 500,
+                speed: 20,
+                spread: 0.20,
+                color: '#eab308',
+                description: 'Emits a heavy sonic shockwave cone that blasts targets backward with immense kinetic force.',
+                unlocked: false
             }
         };
 
@@ -777,7 +894,6 @@
             } catch(e) {}
         }
 
-        // Save Modal & Export / Import Functions
         window.openSaveModal = function() {
             const modal = document.getElementById('save-modal');
             const exportInput = document.getElementById('export-code-input');
@@ -848,7 +964,6 @@
             }
         };
 
-        // Synthesized Audio System
         class SoundSynth {
             constructor() {
                 this.ctx = null;
@@ -954,7 +1069,6 @@
             document.getElementById('spec-stat-spd').textContent = `${Math.round((legConfig.speed / 4.2) * 100)}%`;
             document.getElementById('spec-stat-ability').textContent = abilityConfig.name;
 
-            // Leg Options UI
             const legContainer = document.getElementById('custom-leg-options');
             legContainer.innerHTML = '';
             Object.values(LEG_CATALOG).forEach(leg => {
@@ -976,7 +1090,6 @@
                 legContainer.appendChild(btn);
             });
 
-            // Core Ability Options UI
             const abilityContainer = document.getElementById('custom-ability-options');
             abilityContainer.innerHTML = '';
             Object.values(CORE_ABILITIES_CATALOG).forEach(ab => {
@@ -1000,7 +1113,6 @@
                 abilityContainer.appendChild(btn);
             });
 
-            // Swatches
             const renderSwatches = (containerId, cosmeticType) => {
                 const container = document.getElementById(containerId);
                 container.innerHTML = '';
@@ -1026,7 +1138,6 @@
         function renderGarageUI() {
             document.getElementById('credits-display').textContent = `${playerState.credits.toLocaleString()} C`;
 
-            // Equipped slots
             const slotsContainer = document.getElementById('equipped-slots-container');
             slotsContainer.innerHTML = '';
             const slotNames = ['SLOT 1 (KEY 1)', 'SLOT 2 (KEY 2)', 'SLOT 3 (KEY 3)', 'SLOT 4 (KEY 4)'];
@@ -1052,7 +1163,6 @@
                 slotsContainer.appendChild(card);
             });
 
-            // Weapons grid
             const shopGrid = document.getElementById('shop-weapons-grid');
             shopGrid.innerHTML = '';
 
@@ -1154,6 +1264,7 @@
         let healthSpawnTimer = 0;
         let supplyDropTimer = 0;
         let gameTime = 0;
+        let animationFrameId = null;
 
         const safeZone = {
             x: WORLD_SIZE / 2,
@@ -1203,16 +1314,13 @@
                 ctx.shadowColor = '#10b981';
                 ctx.shadowBlur = glowSize;
 
-                // Crate background
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
                 ctx.fillRect(-14, -14, 28, 28);
 
-                // Crate outline
                 ctx.strokeStyle = '#34d399';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(-14, -14, 28, 28);
 
-                // Plus icon emblem
                 ctx.fillStyle = '#6ee7b7';
                 ctx.fillRect(-9, -3, 18, 6);
                 ctx.fillRect(-3, -9, 6, 18);
@@ -1225,7 +1333,7 @@
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
-                this.altitude = 400; // Drops from sky
+                this.altitude = 400;
                 this.landed = false;
                 this.isCollected = false;
                 this.radius = 22;
@@ -1240,7 +1348,6 @@
                         this.altitude = 0;
                         this.landed = true;
                         audio.playExplosion();
-                        // Impact shockwave particles
                         for (let i = 0; i < 20; i++) {
                             const angle = (i / 20) * Math.PI * 2;
                             particles.push({
@@ -1264,7 +1371,6 @@
                 ctx.translate(this.x, this.y);
 
                 if (!this.landed) {
-                    // Target LZ crosshair on ground
                     ctx.strokeStyle = '#f59e0b';
                     ctx.lineWidth = 2;
                     ctx.setLineDash([4, 4]);
@@ -1272,8 +1378,6 @@
                     ctx.arc(0, 0, 30, 0, Math.PI * 2);
                     ctx.stroke();
                     ctx.setLineDash([]);
-
-                    // Crates descending shadow/icon
                     ctx.translate(0, -this.altitude);
                 }
 
@@ -1361,7 +1465,6 @@
                 this.activeSlotIndex = 0;
                 this.slotCooldowns = [0, 0, 0, 0];
 
-                // Core Ability State
                 this.abilityCooldownTimer = 0;
                 this.shieldActiveTimer = 0;
                 this.repairCharges = 3;
@@ -1446,7 +1549,11 @@
                 const weapon = this.getActiveWeapon();
                 this.slotCooldowns[slotIdx] = weapon.fireRate / 1000;
 
-                audio.playPew(weapon.id === 'blade' ? 200 : (weapon.id === 'tesla' ? 750 : 500), 0.1, weapon.id === 'blade' ? 'triangle' : 'sawtooth');
+                audio.playPew(
+                    weapon.id === 'blade' ? 200 : (weapon.id === 'tesla' || weapon.id === 'chain_lightning' ? 750 : 500),
+                    0.1,
+                    weapon.id === 'blade' ? 'triangle' : 'sawtooth'
+                );
 
                 if (weapon.id === 'blade') {
                     const slashDist = weapon.range;
@@ -1487,7 +1594,6 @@
                 const spawnX = this.x + Math.cos(this.angle) * barrelOffset;
                 const spawnY = this.y + Math.sin(this.angle) * barrelOffset;
 
-                // Heavy Gatling brass casing effect
                 if (weapon.id === 'gatling') {
                     const sideAngle = this.angle + Math.PI / 2;
                     particles.push({
@@ -1535,7 +1641,7 @@
 
                 let effectiveDmg = amount;
                 if (this.shieldActiveTimer > 0) {
-                    effectiveDmg *= 0.20; // 80% damage absorb
+                    effectiveDmg *= 0.20;
                     particles.push({
                         x: this.x,
                         y: this.y,
@@ -1642,12 +1748,10 @@
                         this.aiDir.y = (Math.random() - 0.5) * 2;
                     }
 
-                    // AI Core Ability Trigger
                     if (this.ap < this.maxAp * 0.4) {
                         this.useCoreAbility();
                     }
 
-                    // Seek nearby health boxes if low AP
                     if (this.ap < this.maxAp * 0.65 && !outsideSafe) {
                         let nearestBox = null;
                         let minBoxDist = 500;
@@ -1749,7 +1853,6 @@
                 ctx.save();
                 ctx.translate(this.x, this.y);
 
-                // Pulse shield visual overlay
                 if (this.shieldActiveTimer > 0) {
                     ctx.strokeStyle = '#38bdf8';
                     ctx.fillStyle = 'rgba(56, 189, 248, 0.15)';
@@ -1776,9 +1879,7 @@
                 ctx.strokeStyle = this.secondaryColor;
                 ctx.lineWidth = 2.5;
 
-                // Render chassis legs & geometry based on LegType
                 if (this.legType === 'TANK') {
-                    // Heavy Tank Treads
                     ctx.fillStyle = '#334155';
                     ctx.fillRect(-22, -20, 36, 10);
                     ctx.fillRect(-22, 10, 36, 10);
@@ -1797,7 +1898,6 @@
                     ctx.stroke();
 
                 } else if (this.legType === 'TETRAPOD') {
-                    // 4-Legged stance
                     ctx.strokeStyle = this.secondaryColor;
                     ctx.lineWidth = 3;
                     ctx.beginPath();
@@ -1814,7 +1914,6 @@
                     ctx.stroke();
 
                 } else if (this.legType === 'REVERSE_JOINT') {
-                    // Swept reverse joint legs
                     ctx.strokeStyle = this.secondaryColor;
                     ctx.lineWidth = 3;
                     ctx.beginPath();
@@ -1835,7 +1934,6 @@
                     ctx.stroke();
 
                 } else {
-                    // BIPEDAL standard
                     ctx.beginPath();
                     ctx.moveTo(16, 0);
                     ctx.lineTo(6, 16);
@@ -1893,7 +1991,124 @@
                 if (this.isDead) return;
                 this.animTime += dt;
 
-                if (this.weapon.id === 'missile' || this.weapon.id === 'cluster_missile') {
+                // SPECIAL PARTICLE MECHANICS FOR NEW & EXISTING WEAPONS
+                if (this.weapon.id === 'singularity') {
+                    // Pull nearby mechs inward
+                    mechs.forEach(m => {
+                        if (m !== this.owner && !m.isDead) {
+                            const d = Math.hypot(m.x - this.x, m.y - this.y);
+                            if (d < 220) {
+                                const pullAngle = Math.atan2(this.y - m.y, this.x - m.x);
+                                m.x += Math.cos(pullAngle) * 3.5;
+                                m.y += Math.sin(pullAngle) * 3.5;
+                            }
+                        }
+                    });
+                    // Swirling dark void vortex particles
+                    for (let i = 0; i < 2; i++) {
+                        const a = Math.random() * Math.PI * 2;
+                        const r = Math.random() * 25 + 5;
+                        particles.push({
+                            x: this.x + Math.cos(a) * r,
+                            y: this.y + Math.sin(a) * r,
+                            vx: (this.x - (this.x + Math.cos(a) * r)) * 0.15,
+                            vy: (this.y - (this.y + Math.sin(a) * r)) * 0.15,
+                            life: 0.25,
+                            maxLife: 0.25,
+                            color: Math.random() < 0.5 ? '#a855f7' : '#c084fc',
+                            size: Math.random() * 4 + 2
+                        });
+                    }
+                } else if (this.weapon.id === 'acid_blaster') {
+                    // Dripping caustic acid drops
+                    particles.push({
+                        x: this.x + (Math.random() - 0.5) * 8,
+                        y: this.y + (Math.random() - 0.5) * 8,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 0.3,
+                        maxLife: 0.3,
+                        color: '#84cc16',
+                        size: Math.random() * 4 + 2
+                    });
+                } else if (this.weapon.id === 'cryo_beam') {
+                    // Frost sparkle trail
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: (Math.random() - 0.5) * 1.5,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: '#7dd3fc',
+                        size: Math.random() * 3 + 1.5
+                    });
+                } else if (this.weapon.id === 'saw_launcher') {
+                    // Friction spark spray
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
+                        life: 0.2,
+                        maxLife: 0.2,
+                        color: '#f97316',
+                        size: Math.random() * 3 + 2
+                    });
+                } else if (this.weapon.id === 'orbital_strike') {
+                    // Satellite targeting beam beacon trails
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: 0,
+                        vy: 0,
+                        life: 0.4,
+                        maxLife: 0.4,
+                        color: '#f43f5e',
+                        size: 5
+                    });
+                } else if (this.weapon.id === 'napalm_mortar') {
+                    // Fire embers trailing behind round
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: -this.vx * 0.1 + (Math.random() - 0.5) * 2,
+                        vy: -this.vy * 0.1 + (Math.random() - 0.5) * 2,
+                        life: 0.35,
+                        maxLife: 0.35,
+                        color: '#f59e0b',
+                        size: Math.random() * 5 + 3
+                    });
+                } else if (this.weapon.id === 'needle_gun') {
+                    // Sleek silver energy flecks
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: -this.vx * 0.05,
+                        vy: -this.vy * 0.05,
+                        life: 0.15,
+                        maxLife: 0.15,
+                        color: '#cbd5e1',
+                        size: 1.5
+                    });
+                } else if (this.weapon.id === 'quantum_disruptor') {
+                    // Double Helix Sine-Wave trajectory math
+                    const perpAngle = this.angle + Math.PI / 2;
+                    const waveOffset = Math.sin(this.animTime * 25) * 16;
+                    this.x += Math.cos(perpAngle) * (waveOffset * 0.1);
+                    this.y += Math.sin(perpAngle) * (waveOffset * 0.1);
+
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: 0,
+                        vy: 0,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: '#d946ef',
+                        size: 3
+                    });
+                } else if (this.weapon.id === 'missile' || this.weapon.id === 'cluster_missile') {
                     if (Math.random() < 0.7) {
                         particles.push({
                             x: this.x,
@@ -1958,6 +2173,8 @@
                     this.isDead = true;
                     if (this.weapon.id === 'grenade') {
                         this.spawnGrenadeClusters();
+                    } else if (this.weapon.id === 'napalm_mortar') {
+                        this.spawnNapalmPools();
                     }
                     return;
                 }
@@ -1968,11 +2185,13 @@
                         this.createImpactParticles();
                         if (this.weapon.id === 'grenade') {
                             this.spawnGrenadeClusters();
+                        } else if (this.weapon.id === 'napalm_mortar') {
+                            this.spawnNapalmPools();
                         }
                     }
                 });
 
-                if (this.weapon.id === 'moonlight') {
+                if (this.weapon.id === 'moonlight' || this.weapon.id === 'saw_launcher') {
                     mechs.forEach(mech => {
                         if (mech !== this.owner && !mech.isDead && !this.hitTargets.has(mech.id)) {
                             if (Math.hypot(this.x - mech.x, this.y - mech.y) < 38) {
@@ -1992,8 +2211,40 @@
                             this.isDead = true;
                             this.createImpactParticles();
 
+                            // Seismic Cannon Heavy Knockback
+                            if (this.weapon.id === 'seismic_cannon') {
+                                const knockAngle = Math.atan2(mech.y - this.y, mech.x - this.x);
+                                mech.x += Math.cos(knockAngle) * 75;
+                                mech.y += Math.sin(knockAngle) * 75;
+                            }
+
+                            // Chain Lightning Jumping Arc
+                            if (this.weapon.id === 'chain_lightning') {
+                                mechs.forEach(chainMech => {
+                                    if (chainMech !== mech && chainMech !== this.owner && !chainMech.isDead) {
+                                        if (Math.hypot(mech.x - chainMech.x, mech.y - chainMech.y) < 220) {
+                                            chainMech.takeDamage(this.damage * 0.6, this.owner, `${this.weapon.name} CHAIN`);
+                                            for (let c = 0; c < 6; c++) {
+                                                particles.push({
+                                                    x: (mech.x + chainMech.x) / 2 + (Math.random() - 0.5) * 20,
+                                                    y: (mech.y + chainMech.y) / 2 + (Math.random() - 0.5) * 20,
+                                                    vx: (Math.random() - 0.5) * 4,
+                                                    vy: (Math.random() - 0.5) * 4,
+                                                    life: 0.25,
+                                                    maxLife: 0.25,
+                                                    color: '#06b6d4',
+                                                    size: 3
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
                             if (this.weapon.id === 'grenade') {
                                 this.spawnGrenadeClusters();
+                            } else if (this.weapon.id === 'napalm_mortar') {
+                                this.spawnNapalmPools();
                             }
 
                             if (this.weapon.splashRadius) {
@@ -2023,6 +2274,23 @@
                         color: '#f97316'
                     };
                     projectiles.push(new Projectile(this.x, this.y, angle, subWeapon, this.owner));
+                }
+            }
+
+            spawnNapalmPools() {
+                for (let i = 0; i < 16; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 70;
+                    particles.push({
+                        x: this.x + Math.cos(angle) * dist,
+                        y: this.y + Math.sin(angle) * dist,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 0.8,
+                        maxLife: 0.8,
+                        color: Math.random() < 0.5 ? '#f59e0b' : '#ef4444',
+                        size: Math.random() * 8 + 4
+                    });
                 }
             }
 
@@ -2155,6 +2423,83 @@
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(-14, -1, 28, 2);
 
+                } else if (wid === 'singularity') {
+                    // Swirling void orb
+                    ctx.fillStyle = '#a855f7';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#e9d5ff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                } else if (wid === 'acid_blaster') {
+                    ctx.fillStyle = '#84cc16';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else if (wid === 'cryo_beam') {
+                    ctx.fillStyle = '#38bdf8';
+                    ctx.beginPath();
+                    ctx.moveTo(14, 0);
+                    ctx.lineTo(-10, -6);
+                    ctx.lineTo(-6, 0);
+                    ctx.lineTo(-10, 6);
+                    ctx.closePath();
+                    ctx.fill();
+
+                } else if (wid === 'saw_launcher') {
+                    // Rotating serrated buzzsaw
+                    ctx.rotate(this.animTime * 30);
+                    ctx.fillStyle = '#f97316';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 14, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#ffedd5';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                } else if (wid === 'orbital_strike') {
+                    ctx.strokeStyle = '#f43f5e';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 16, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                } else if (wid === 'chain_lightning') {
+                    ctx.strokeStyle = '#06b6d4';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(-12, -4);
+                    ctx.lineTo(0, 4);
+                    ctx.lineTo(12, -4);
+                    ctx.stroke();
+
+                } else if (wid === 'napalm_mortar') {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 9, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else if (wid === 'needle_gun') {
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillRect(-12, -1, 24, 2);
+
+                } else if (wid === 'quantum_disruptor') {
+                    ctx.fillStyle = '#d946ef';
+                    ctx.beginPath();
+                    ctx.arc(-4, -4, 5, 0, Math.PI * 2);
+                    ctx.arc(4, 4, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else if (wid === 'seismic_cannon') {
+                    ctx.strokeStyle = '#eab308';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 15, -Math.PI / 3, Math.PI / 3);
+                    ctx.stroke();
+
                 } else {
                     ctx.fillRect(-8, -2, 16, 4);
                 }
@@ -2227,6 +2572,13 @@
             document.getElementById('summary-payout').textContent = `+${totalPayout.toLocaleString()} C`;
 
             document.getElementById('summary-screen').classList.remove('hidden');
+        }
+
+        function returnToGarage() {
+            document.getElementById('summary-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('garage-screen').classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+            renderGarageUI();
         }
 
         function setupEventListeners() {
@@ -2317,6 +2669,7 @@
         }
 
         function resizeCanvas() {
+            if (!canvas) return;
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
         }
@@ -2396,248 +2749,244 @@
             }
 
             updateHUDWeaponSlots();
-
-            // Set HUD Core Ability Display
-            const abilityData = CORE_ABILITIES_CATALOG[playerMech.activeAbilityKey];
-            document.getElementById('hud-ability-icon').className = `fa-solid ${abilityData.icon} text-base text-amber-400 mb-0.5`;
-            document.getElementById('hud-ability-name').textContent = abilityData.name;
-
-            document.getElementById('hud-alive-count').textContent = mechs.length;
-            document.getElementById('hud-kill-count').textContent = "0";
-
             isGameActive = true;
+            lastTime = performance.now();
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            gameLoop(performance.now());
         }
 
-        function returnToGarage() {
-            document.getElementById('summary-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.add('hidden');
-            
-            const garage = document.getElementById('garage-screen');
-            garage.classList.remove('hidden');
-            setTimeout(() => {
-                garage.classList.remove('opacity-0', 'pointer-events-none');
-            }, 50);
-
-            renderGarageUI();
-        }
-
-        let lastTime = performance.now();
-
+        let lastTime = 0;
         function gameLoop(now) {
-            const dt = Math.min(0.05, (now - lastTime) / 1000);
+            if (!isGameActive) return;
+            const dt = Math.min(0.1, (now - lastTime) / 1000);
             lastTime = now;
 
-            if (isGameActive && playerMech) {
-                gameTime += dt;
+            updateGame(dt);
+            renderGame();
 
-                // Health & Supply Drop Timers
-                healthSpawnTimer += dt;
-                if (healthSpawnTimer >= 10) {
-                    healthSpawnTimer = 0;
-                    spawnHealthBox();
-                }
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
 
-                supplyDropTimer += dt;
-                if (supplyDropTimer >= 22) {
-                    supplyDropTimer = 0;
-                    triggerSupplyDrop();
-                }
+        function updateGame(dt) {
+            gameTime += dt;
 
-                safeZone.timer -= dt;
-                if (safeZone.timer <= 0) {
-                    safeZone.timer = 20;
-                    safeZone.targetRadius = Math.max(150, safeZone.radius - 280);
-                    document.getElementById('hud-zone-warning').classList.remove('hidden');
-                }
+            // Safe zone timer & shrink
+            safeZone.timer -= dt;
+            const zoneWarning = document.getElementById('hud-zone-warning');
+            const zoneTimerText = document.getElementById('hud-zone-timer');
 
-                if (safeZone.radius > safeZone.targetRadius) {
-                    safeZone.radius -= safeZone.shrinkSpeed;
-                }
+            if (safeZone.timer <= 0) {
+                safeZone.targetRadius = Math.max(150, safeZone.targetRadius - 250);
+                safeZone.timer = 25;
+            }
 
-                const zoneTimerInt = Math.ceil(safeZone.timer);
-                document.getElementById('hud-zone-timer').textContent = `SAFE ZONE SHRINKING IN ${zoneTimerInt}s`;
+            if (safeZone.radius > safeZone.targetRadius) {
+                safeZone.radius -= safeZone.shrinkSpeed * 60 * dt;
+            }
 
-                const cameraX = playerMech.x - canvas.width / 2;
-                const cameraY = playerMech.y - canvas.height / 2;
-                mouseWorldX = mouseX + cameraX;
-                mouseWorldY = mouseY + cameraY;
+            if (safeZone.timer <= 10) {
+                zoneWarning.classList.remove('hidden');
+                zoneTimerText.textContent = `SAFE ZONE SHRINKING IN ${Math.ceil(safeZone.timer)}s`;
+            } else {
+                zoneWarning.classList.add('hidden');
+            }
+
+            // Health crate / supply drop timers
+            healthSpawnTimer += dt;
+            if (healthSpawnTimer >= 15) {
+                healthSpawnTimer = 0;
+                spawnHealthBox();
+            }
+
+            supplyDropTimer += dt;
+            if (supplyDropTimer >= 35) {
+                supplyDropTimer = 0;
+                triggerSupplyDrop();
+            }
+
+            // Mouse position world translation
+            if (playerMech) {
+                mouseWorldX = playerMech.x + (mouseX - canvas.width / 2);
+                mouseWorldY = playerMech.y + (mouseY - canvas.height / 2);
 
                 if (isMouseDown && !playerMech.isDead) {
                     playerMech.fireCurrentWeapon();
                 }
+            }
 
-                healthBoxes.forEach(hb => hb.update(dt));
-                supplyDrops.forEach(sd => sd.update(dt));
+            // Update Mechs
+            mechs.forEach(m => m.update(dt));
 
-                // Collision with AP & Supply Drops
-                mechs.forEach(m => {
-                    if (m.isDead) return;
-
-                    // Health Crates
-                    healthBoxes.forEach(hb => {
-                        if (!hb.isCollected && m.ap < m.maxAp) {
-                            if (Math.hypot(m.x - hb.x, m.y - hb.y) < 22 + hb.radius) {
-                                hb.isCollected = true;
-                                m.ap = Math.min(m.maxAp, m.ap + hb.healAmount);
-                                if (m.isPlayer) audio.playHeal();
-                                for (let i = 0; i < 14; i++) {
-                                    particles.push({
-                                        x: hb.x + (Math.random() - 0.5) * 20,
-                                        y: hb.y + (Math.random() - 0.5) * 20,
-                                        vx: (Math.random() - 0.5) * 3,
-                                        vy: -Math.random() * 4 - 1,
-                                        life: 0.5,
-                                        maxLife: 0.5,
-                                        color: '#34d399',
-                                        size: Math.random() * 4 + 2
-                                    });
-                                }
-                            }
+            // Health Crate Pickup Check
+            healthBoxes.forEach(hb => {
+                if (!hb.isCollected) {
+                    hb.update(dt);
+                    mechs.forEach(m => {
+                        if (!m.isDead && Math.hypot(m.x - hb.x, m.y - hb.y) < m.speed + hb.radius + 10) {
+                            hb.isCollected = true;
+                            m.ap = Math.min(m.maxAp, m.ap + hb.healAmount);
+                            if (m.isPlayer) audio.playHeal();
                         }
                     });
+                }
+            });
 
-                    // Supply Drops
-                    supplyDrops.forEach(sd => {
-                        if (sd.landed && !sd.isCollected) {
-                            if (Math.hypot(m.x - sd.x, m.y - sd.y) < 22 + sd.radius) {
+            // Supply Drop Pickup Check
+            supplyDrops.forEach(sd => {
+                if (!sd.isCollected) {
+                    sd.update(dt);
+                    if (sd.landed) {
+                        mechs.forEach(m => {
+                            if (!m.isDead && Math.hypot(m.x - sd.x, m.y - sd.y) < m.speed + sd.radius + 12) {
                                 sd.isCollected = true;
-                                m.ap = Math.min(m.maxAp, m.ap + 1200);
+                                m.ap = m.maxAp;
                                 m.en = m.maxEn;
                                 if (m.isPlayer) {
                                     audio.playHeal();
-                                    addKillFeed("RECLAIMED SUPPLY POD (+1200 AP & EN BOOST)");
+                                    addKillFeed("TACTICAL SUPPLY SECURED: FULL AP & ENERGY RESTORED!");
                                 }
                             }
-                        }
-                    });
-                });
-
-                mechs.forEach(m => m.update(dt));
-
-                projectiles.forEach(p => p.update(dt));
-                projectiles = projectiles.filter(p => !p.isDead);
-
-                particles.forEach(pt => {
-                    pt.x += pt.vx;
-                    pt.y += pt.vy;
-                    pt.life -= dt;
-                });
-                particles = particles.filter(pt => pt.life > 0);
-
-                // Update HUD Elements
-                document.getElementById('hud-ap-text').textContent = `${Math.ceil(playerMech.ap)} / ${playerMech.maxAp}`;
-                document.getElementById('hud-ap-bar').style.width = `${Math.max(0, (playerMech.ap / playerMech.maxAp) * 100)}%`;
-
-                document.getElementById('hud-en-text').textContent = `${Math.ceil((playerMech.en / playerMech.maxEn) * 100)}%`;
-                document.getElementById('hud-en-bar').style.width = `${(playerMech.en / playerMech.maxEn) * 100}%`;
-
-                // Core ability status indicator
-                const abilityStatus = document.getElementById('hud-ability-status');
-                if (playerMech.abilityCooldownTimer > 0) {
-                    abilityStatus.textContent = `${Math.ceil(playerMech.abilityCooldownTimer)}s`;
-                    abilityStatus.className = "text-[9px] text-amber-400 font-extrabold";
-                } else if (playerMech.activeAbilityKey === 'repair_kit' && playerMech.repairCharges <= 0) {
-                    abilityStatus.textContent = "EMPTY";
-                    abilityStatus.className = "text-[9px] text-rose-500 font-extrabold";
-                } else {
-                    abilityStatus.textContent = "READY";
-                    abilityStatus.className = "text-[9px] text-emerald-400 font-extrabold";
+                        });
+                    }
                 }
+            });
 
-                // Render background grid & world
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Update Projectiles & Particles
+            projectiles.forEach(p => p.update(dt));
+            projectiles = projectiles.filter(p => !p.isDead);
 
-                ctx.save();
-                ctx.translate(-cameraX, -cameraY);
+            particles.forEach(pt => {
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.life -= dt;
+            });
+            particles = particles.filter(pt => pt.life > 0);
 
-                // Draw arena boundaries
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 8;
-                ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+            // Update Player HUD
+            if (playerMech) {
+                const apBar = document.getElementById('hud-ap-bar');
+                const apText = document.getElementById('hud-ap-text');
+                const enBar = document.getElementById('hud-en-bar');
+                const enText = document.getElementById('hud-en-text');
 
-                // Draw safe zone circle
-                ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)';
-                ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.arc(safeZone.x, safeZone.y, safeZone.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
+                const apPct = Math.max(0, (playerMech.ap / playerMech.maxAp) * 100);
+                apBar.style.width = `${apPct}%`;
+                apText.textContent = `${Math.ceil(playerMech.ap)} / ${playerMech.maxAp}`;
 
-                // Draw obstacles
-                obstacles.forEach(obs => {
-                    ctx.fillStyle = '#1e293b';
-                    ctx.strokeStyle = '#475569';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.stroke();
-                });
+                const enPct = Math.max(0, (playerMech.en / playerMech.maxEn) * 100);
+                enBar.style.width = `${enPct}%`;
+                enText.textContent = `${Math.ceil(enPct)}%`;
 
-                // Draw drops & boxes
-                healthBoxes.forEach(hb => hb.draw(ctx));
-                supplyDrops.forEach(sd => sd.draw(ctx));
-
-                // Draw projectiles
-                projectiles.forEach(p => p.draw(ctx));
-
-                // Draw mechs
-                mechs.forEach(m => m.draw(ctx));
-
-                // Draw particles
-                particles.forEach(pt => {
-                    ctx.fillStyle = pt.color;
-                    ctx.beginPath();
-                    ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-
-                ctx.restore();
-
-                // Minimap Render
-                drawMinimap();
+                const abStatus = document.getElementById('hud-ability-status');
+                if (playerMech.abilityCooldownTimer > 0) {
+                    abStatus.textContent = `${Math.ceil(playerMech.abilityCooldownTimer)}s`;
+                    abStatus.className = "text-[9px] text-amber-400 font-extrabold";
+                } else {
+                    abStatus.textContent = "READY";
+                    abStatus.className = "text-[9px] text-emerald-400 font-extrabold";
+                }
             }
-
-            requestAnimationFrame(gameLoop);
         }
 
-        function drawMinimap() {
-            if (!minimapCtx) return;
-            minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+        function renderGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            ctx.save();
+            if (playerMech) {
+                ctx.translate(canvas.width / 2 - playerMech.x, canvas.height / 2 - playerMech.y);
+            }
+
+            // World boundary grid
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.15)';
+            ctx.lineWidth = 2;
+            const gridSize = 100;
+            for (let x = 0; x <= WORLD_SIZE; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke();
+            }
+            for (let y = 0; y <= WORLD_SIZE; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+
+            // Safe Zone Ring
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([12, 8]);
+            ctx.beginPath();
+            ctx.arc(safeZone.x, safeZone.y, safeZone.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Obstacles
+            obstacles.forEach(obs => {
+                ctx.fillStyle = '#1e293b';
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // Health Boxes & Supply Drops
+            healthBoxes.forEach(hb => hb.draw(ctx));
+            supplyDrops.forEach(sd => sd.draw(ctx));
+
+            // Mechs, Projectiles, Particles
+            mechs.forEach(m => m.draw(ctx));
+            projectiles.forEach(p => p.draw(ctx));
+
+            particles.forEach(pt => {
+                ctx.save();
+                ctx.globalAlpha = pt.life / pt.maxLife;
+                ctx.fillStyle = pt.color;
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            ctx.restore();
+
+            // Render Minimap
+            renderMinimap();
+        }
+
+        function renderMinimap() {
+            minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
             const scale = minimapCanvas.width / WORLD_SIZE;
 
-            // Safe Zone
-            minimapCtx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+            minimapCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+
+            minimapCtx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
             minimapCtx.lineWidth = 1.5;
             minimapCtx.beginPath();
             minimapCtx.arc(safeZone.x * scale, safeZone.y * scale, safeZone.radius * scale, 0, Math.PI * 2);
             minimapCtx.stroke();
 
-            // Mechs
             mechs.forEach(m => {
                 if (m.isDead) return;
-                minimapCtx.fillStyle = m.isPlayer ? '#06b6d4' : '#ef4444';
+                minimapCtx.fillStyle = m.isPlayer ? '#06b6d4' : '#f43f5e';
                 minimapCtx.beginPath();
                 minimapCtx.arc(m.x * scale, m.y * scale, m.isPlayer ? 3.5 : 2.5, 0, Math.PI * 2);
                 minimapCtx.fill();
             });
         }
 
-        window.onload = function() {
+        window.addEventListener('DOMContentLoaded', () => {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
-
             minimapCanvas = document.getElementById('minimapCanvas');
             minimapCtx = minimapCanvas.getContext('2d');
 
-            setupEventListeners();
             loadPlayerState();
             renderGarageUI();
-
-            requestAnimationFrame(gameLoop);
-        };
+            setupEventListeners();
+        });
     </script>
 </body>
 </html>
