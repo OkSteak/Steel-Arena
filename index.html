@@ -205,7 +205,7 @@
                 WASD to maneuver, 1-4 for weapons, E / Touch for Core Ability, Space for Boost, Click/Tap to aim & fire.
             </div>
 
-            <button id="btn-deploy" onclick="startGame()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-black text-lg tracking-wider rounded-lg transition-all transform active:scale-95 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-3">
+            <button id="btn-deploy" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-black text-lg tracking-wider rounded-lg transition-all transform active:scale-95 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-3">
                 <i class="fa-solid fa-crosshairs text-xl"></i> DEPLOY TO ARENA
             </button>
         </div>
@@ -357,7 +357,7 @@
                 </div>
             </div>
 
-            <button id="btn-return-hangar" onclick="returnToHangar()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-orbitron font-black tracking-wider text-base rounded-xl transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
+            <button id="btn-return-hangar" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-orbitron font-black tracking-wider text-base rounded-xl transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-house-chimney-crack"></i> CLAIM & RETURN TO HANGAR
             </button>
         </div>
@@ -681,6 +681,8 @@
                 description: 'Fires 3 rapid heavy royal-blue laser lances with intense core glow and lens flares.',
                 unlocked: false
             },
+
+            // 10 UNIQUE BALANCED WEAPONS
             singularity: {
                 id: 'singularity',
                 name: 'VOID SINGULARITY',
@@ -835,6 +837,8 @@
                 description: 'Emits a heavy sonic shockwave cone that blasts targets backward with immense kinetic force.',
                 unlocked: false
             },
+
+            // 5 NEW HIGH LEVEL & EXPENSIVE WEAPONS
             nuke_mortar: {
                 id: 'nuke_mortar',
                 name: 'NUKE MORTAR',
@@ -910,21 +914,6 @@
                 spread: 0,
                 color: '#38bdf8',
                 description: 'Summons a small friendly mech drone that attacks enemies with a laser. Low AP and easily killed.',
-                unlocked: false
-            },
-            pile_bunker: {
-                id: 'pile_bunker',
-                name: 'PILE BUNKER',
-                icon: 'fa-hammer',
-                type: 'Kinetic Thrust',
-                price: 8800,
-                damage: 1500,
-                fireRate: 1500,
-                range: 600,
-                speed: 40,
-                spread: 0,
-                color: '#f59e0b',
-                description: 'Anchor in place while holding to charge the pneumatic spike. Releasing propels you forward through walls, crushing hit targets.',
                 unlocked: false
             }
         };
@@ -1351,7 +1340,6 @@
         let supplyDrops = [];
         let nukeZones = [];
         let orbitalZones = [];
-        let heavensWrathZones = [];
         let healthSpawnTimer = 0;
         let supplyDropTimer = 0;
         let gameTime = 0;
@@ -1564,14 +1552,6 @@
 
                 this.coreSplitterTimer = 0;
 
-                // Pile Bunker State
-                this.isChargingPileBunker = false;
-                this.pileBunkerChargeTime = 0;
-                this.pileBunkerDashTimer = 0;
-                this.pileBunkerDashAngle = 0;
-                this.pileBunkerDamage = 0;
-                this.pileBunkerHitTargets = new Set();
-
                 this.kills = 0;
                 this.damageDealt = 0;
                 this.isDead = false;
@@ -1650,11 +1630,6 @@
                 if (this.slotCooldowns[slotIdx] > 0) return;
 
                 const weapon = this.getActiveWeapon();
-
-                if (weapon.id === 'pile_bunker') {
-                    return;
-                }
-
                 this.slotCooldowns[slotIdx] = weapon.fireRate / 1000;
 
                 audio.playPew(
@@ -1662,21 +1637,6 @@
                     0.1,
                     weapon.id === 'blade' ? 'triangle' : 'sawtooth'
                 );
-
-                if (weapon.id === 'heavens_wrath') {
-                    heavensWrathZones.push({
-                        x: this.x,
-                        y: this.y,
-                        angle: this.angle,
-                        width: 90,
-                        delayTimer: 2.2,
-                        activeTimer: 3.5,
-                        owner: this,
-                        damage: weapon.damage,
-                        hitCool: 0
-                    });
-                    return;
-                }
 
                 if (weapon.id === 'nuke_mortar') {
                     const targetDist = this.isPlayer ? Math.hypot(mouseWorldX - this.x, mouseWorldY - this.y) : weapon.range;
@@ -1870,42 +1830,6 @@
                 }
 
                 const activeWp = this.getActiveWeapon();
-
-                // PILE BUNKER LOGIC
-                if (activeWp.id === 'pile_bunker') {
-                    const isFiringPressed = (this.isPlayer && isMouseDown) || (!this.isPlayer && this.aiMoveTimer > 0 && Math.random() < 0.3);
-                    if (isFiringPressed && this.slotCooldowns[this.activeSlotIndex] <= 0 && this.pileBunkerDashTimer <= 0) {
-                        this.isChargingPileBunker = true;
-                        this.pileBunkerChargeTime = Math.min(2.5, this.pileBunkerChargeTime + dt);
-                        
-                        if (Math.random() < 0.8) {
-                            particles.push({
-                                x: this.x + (Math.random() - 0.5) * 30,
-                                y: this.y + (Math.random() - 0.5) * 30,
-                                vx: (this.x - (this.x + (Math.random() - 0.5) * 30)) * 0.2,
-                                vy: (this.y - (this.y + (Math.random() - 0.5) * 30)) * 0.2,
-                                life: 0.2,
-                                maxLife: 0.2,
-                                color: '#f59e0b',
-                                size: Math.random() * 4 + 2
-                            });
-                        }
-                    } else if (this.isChargingPileBunker) {
-                        this.isChargingPileBunker = false;
-                        this.pileBunkerDashTimer = 0.35;
-                        this.pileBunkerDashAngle = this.angle;
-                        const chargeRatio = Math.max(0.2, this.pileBunkerChargeTime / 2.5);
-                        this.pileBunkerDamage = activeWp.damage * chargeRatio;
-                        this.pileBunkerHitTargets.clear();
-                        this.slotCooldowns[this.activeSlotIndex] = activeWp.fireRate / 1000;
-                        this.pileBunkerChargeTime = 0;
-                        audio.playExplosion();
-                    }
-                } else {
-                    this.isChargingPileBunker = false;
-                    this.pileBunkerChargeTime = 0;
-                }
-
                 if (activeWp.id === 'core_splitter' && ((this.isPlayer && isMouseDown) || (!this.isPlayer && this.aiMoveTimer > 0))) {
                     this.coreSplitterTimer += dt;
                     const rampedDmg = activeWp.damage * (1 + this.coreSplitterTimer * 3.5);
@@ -1946,41 +1870,7 @@
                 let moveX = 0;
                 let moveY = 0;
 
-                if (this.pileBunkerDashTimer > 0) {
-                    this.pileBunkerDashTimer -= dt;
-                    const dashSpeed = 32;
-                    this.vx = Math.cos(this.pileBunkerDashAngle) * dashSpeed;
-                    this.vy = Math.sin(this.pileBunkerDashAngle) * dashSpeed;
-
-                    particles.push({
-                        x: this.x,
-                        y: this.y,
-                        vx: -this.vx * 0.2,
-                        vy: -this.vy * 0.2,
-                        life: 0.3,
-                        maxLife: 0.3,
-                        color: '#f59e0b',
-                        size: 8
-                    });
-
-                    mechs.forEach(target => {
-                        if (target !== this && !target.isDead && !this.pileBunkerHitTargets.has(target.id)) {
-                            const d = Math.hypot(target.x - this.x, target.y - this.y);
-                            if (d <= 45) {
-                                target.takeDamage(this.pileBunkerDamage, this, "PILE BUNKER");
-                                this.pileBunkerHitTargets.add(target.id);
-                                audio.playExplosion();
-                            }
-                        }
-                    });
-
-                } else if (this.isChargingPileBunker) {
-                    this.vx = 0;
-                    this.vy = 0;
-                    if (this.isPlayer) {
-                        this.angle = Math.atan2(mouseWorldY - this.y, mouseWorldX - this.x);
-                    }
-                } else if (this.isDrone && this.droneOwner && !this.droneOwner.isDead) {
+                if (this.isDrone && this.droneOwner && !this.droneOwner.isDead) {
                     const distToOwner = Math.hypot(this.droneOwner.x - this.x, this.droneOwner.y - this.y);
                     if (distToOwner > 120) {
                         const angleToOwner = Math.atan2(this.droneOwner.y - this.y, this.droneOwner.x - this.x);
@@ -2088,31 +1978,29 @@
                     }
                 }
 
-                if (!this.isChargingPileBunker && this.pileBunkerDashTimer <= 0) {
-                    const len = Math.hypot(moveX, moveY);
-                    if (len > 0) {
-                        moveX /= len;
-                        moveY /= len;
-                        const curSpeed = this.speed * (this.isBoosting ? this.boostMultiplier : 1);
-                        this.vx = moveX * curSpeed;
-                        this.vy = moveY * curSpeed;
+                const len = Math.hypot(moveX, moveY);
+                if (len > 0) {
+                    moveX /= len;
+                    moveY /= len;
+                    const curSpeed = this.speed * (this.isBoosting ? this.boostMultiplier : 1);
+                    this.vx = moveX * curSpeed;
+                    this.vy = moveY * curSpeed;
 
-                        if (Math.random() < 0.6) {
-                            particles.push({
-                                x: this.x - Math.cos(this.angle) * 18,
-                                y: this.y - Math.sin(this.angle) * 18,
-                                vx: -moveX * 2 + (Math.random() - 0.5),
-                                vy: -moveY * 2 + (Math.random() - 0.5),
-                                life: 0.3,
-                                maxLife: 0.3,
-                                color: this.isBoosting ? this.glowColor : '#f59e0b',
-                                size: Math.random() * 4 + 2
-                            });
-                        }
-                    } else {
-                        this.vx *= 0.8;
-                        this.vy *= 0.8;
+                    if (Math.random() < 0.6) {
+                        particles.push({
+                            x: this.x - Math.cos(this.angle) * 18,
+                            y: this.y - Math.sin(this.angle) * 18,
+                            vx: -moveX * 2 + (Math.random() - 0.5),
+                            vy: -moveY * 2 + (Math.random() - 0.5),
+                            life: 0.3,
+                            maxLife: 0.3,
+                            color: this.isBoosting ? this.glowColor : '#f59e0b',
+                            size: Math.random() * 4 + 2
+                        });
                     }
+                } else {
+                    this.vx *= 0.8;
+                    this.vy *= 0.8;
                 }
 
                 this.x += this.vx;
@@ -2121,18 +2009,16 @@
                 this.x = Math.max(50, Math.min(WORLD_SIZE - 50, this.x));
                 this.y = Math.max(50, Math.min(WORLD_SIZE - 50, this.y));
 
-                if (this.pileBunkerDashTimer <= 0) {
-                    obstacles.forEach(obs => {
-                        const dist = Math.hypot(this.x - obs.x, this.y - obs.y);
-                        const minDist = obs.radius + 20;
-                        if (dist < minDist) {
-                            const overlap = minDist - dist;
-                            const angle = Math.atan2(this.y - obs.y, this.x - obs.x);
-                            this.x += Math.cos(angle) * overlap;
-                            this.y += Math.sin(angle) * overlap;
-                        }
-                    });
-                }
+                obstacles.forEach(obs => {
+                    const dist = Math.hypot(this.x - obs.x, this.y - obs.y);
+                    const minDist = obs.radius + 20;
+                    if (dist < minDist) {
+                        const overlap = minDist - dist;
+                        const angle = Math.atan2(this.y - obs.y, this.x - obs.x);
+                        this.x += Math.cos(angle) * overlap;
+                        this.y += Math.sin(angle) * overlap;
+                    }
+                });
 
                 const distFromSafeCenter = Math.hypot(this.x - safeZone.x, this.y - safeZone.y);
                 if (distFromSafeCenter > safeZone.radius) {
@@ -2145,14 +2031,6 @@
 
                 ctx.save();
                 ctx.translate(this.x, this.y);
-
-                if (this.isChargingPileBunker) {
-                    ctx.strokeStyle = '#f59e0b';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 35 + Math.sin(gameTime * 20) * 5, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
 
                 if (this.shieldActiveTimer > 0) {
                     ctx.strokeStyle = '#38bdf8';
@@ -2297,6 +2175,7 @@
                 this.range = weapon.range;
                 this.isDead = false;
                 this.animTime = 0;
+                this.hitTargets = new Set();
 
                 this.vx = Math.cos(angle) * this.speed;
                 this.vy = Math.sin(angle) * this.speed;
@@ -2337,31 +2216,135 @@
                         y: this.y + (Math.random() - 0.5) * 8,
                         vx: (Math.random() - 0.5) * 2,
                         vy: (Math.random() - 0.5) * 2,
+                        life: 0.3,
+                        maxLife: 0.3,
+                        color: '#84cc16',
+                        size: Math.random() * 4 + 2
+                    });
+                } else if (this.weapon.id === 'cryo_beam') {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 1.5,
+                        vy: (Math.random() - 0.5) * 1.5,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: '#7dd3fc',
+                        size: Math.random() * 3 + 1.5
+                    });
+                } else if (this.weapon.id === 'saw_launcher') {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 4,
+                        vy: (Math.random() - 0.5) * 4,
                         life: 0.2,
                         maxLife: 0.2,
-                        color: '#84cc16',
-                        size: 4
+                        color: '#f97316',
+                        size: Math.random() * 3 + 2
+                    });
+                } else if (this.weapon.id === 'orbital_strike') {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: 0,
+                        vy: 0,
+                        life: 0.4,
+                        maxLife: 0.4,
+                        color: '#f43f5e',
+                        size: 5
+                    });
+                } else if (this.weapon.id === 'napalm_mortar') {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: -this.vx * 0.1 + (Math.random() - 0.5) * 2,
+                        vy: -this.vy * 0.1 + (Math.random() - 0.5) * 2,
+                        life: 0.35,
+                        maxLife: 0.35,
+                        color: '#f59e0b',
+                        size: Math.random() * 5 + 3
+                    });
+                } else if (this.weapon.id === 'needle_gun') {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: -this.vx * 0.05,
+                        vy: -this.vy * 0.05,
+                        life: 0.15,
+                        maxLife: 0.15,
+                        color: '#cbd5e1',
+                        size: 1.5
+                    });
+                } else if (this.weapon.id === 'quantum_disruptor') {
+                    const perpAngle = this.angle + Math.PI / 2;
+                    const waveOffset = Math.sin(this.animTime * 25) * 16;
+                    this.x += Math.cos(perpAngle) * (waveOffset * 0.1);
+                    this.y += Math.sin(perpAngle) * (waveOffset * 0.1);
+
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: 0,
+                        vy: 0,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: '#d946ef',
+                        size: 3
+                    });
+                } else if (this.weapon.id === 'missile' || this.weapon.id === 'cluster_missile') {
+                    if (Math.random() < 0.7) {
+                        particles.push({
+                            x: this.x,
+                            y: this.y,
+                            vx: -this.vx * 0.2 + (Math.random() - 0.5) * 1,
+                            vy: -this.vy * 0.2 + (Math.random() - 0.5) * 1,
+                            life: 0.35,
+                            maxLife: 0.35,
+                            color: this.weapon.color,
+                            size: 3
+                        });
+                    }
+                } else if (this.weapon.id === 'flamethrower') {
+                    particles.push({
+                        x: this.x + (Math.random() - 0.5) * 12,
+                        y: this.y + (Math.random() - 0.5) * 12,
+                        vx: this.vx * 0.3 + (Math.random() - 0.5) * 2,
+                        vy: this.vy * 0.3 + (Math.random() - 0.5) * 2,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: Math.random() < 0.5 ? '#ef4444' : '#f59e0b',
+                        size: Math.random() * 6 + 4
+                    });
+                } else if (this.weapon.id === 'tesla') {
+                    particles.push({
+                        x: this.x + (Math.random() - 0.5) * 10,
+                        y: this.y + (Math.random() - 0.5) * 10,
+                        vx: (Math.random() - 0.5) * 3,
+                        vy: (Math.random() - 0.5) * 3,
+                        life: 0.2,
+                        maxLife: 0.2,
+                        color: '#e9d5ff',
+                        size: 2.5
                     });
                 }
 
                 if (this.isHoming) {
-                    let target = null;
-                    let minDist = 800;
+                    let nearestTarget = null;
+                    let minDist = 550;
                     mechs.forEach(m => {
-                        if (m !== this.owner && !m.isDead && m !== this.owner?.droneOwner) {
+                        if (m !== this.owner && !m.isDead) {
                             const d = Math.hypot(m.x - this.x, m.y - this.y);
                             if (d < minDist) {
                                 minDist = d;
-                                target = m;
+                                nearestTarget = m;
                             }
                         }
                     });
-                    if (target) {
-                        const targetAngle = Math.atan2(target.y - this.y, target.x - this.x);
-                        let diff = targetAngle - this.angle;
-                        while (diff < -Math.PI) diff += Math.PI * 2;
-                        while (diff > Math.PI) diff -= Math.PI * 2;
-                        this.angle += Math.sign(diff) * Math.min(Math.abs(diff), 4 * dt);
+
+                    if (nearestTarget) {
+                        const targetAngle = Math.atan2(nearestTarget.y - this.y, nearestTarget.x - this.x);
+                        this.angle += (targetAngle - this.angle) * 0.1;
                         this.vx = Math.cos(this.angle) * this.speed;
                         this.vy = Math.sin(this.angle) * this.speed;
                     }
@@ -2370,39 +2353,90 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
-                const distTraveled = Math.hypot(this.x - this.startX, this.y - this.startY);
-                if (distTraveled >= this.range) {
-                    this.explode();
+                if (Math.hypot(this.x - this.startX, this.y - this.startY) >= this.range) {
+                    this.isDead = true;
+                    if (this.weapon.id === 'grenade') {
+                        this.spawnGrenadeClusters();
+                    } else if (this.weapon.id === 'napalm_mortar') {
+                        this.spawnNapalmPools();
+                    }
                     return;
                 }
 
                 obstacles.forEach(obs => {
-                    if (this.isDead) return;
-                    if (Math.hypot(this.x - obs.x, this.y - obs.y) < obs.radius + 5) {
-                        this.explode();
+                    if (Math.hypot(this.x - obs.x, this.y - obs.y) < obs.radius) {
+                        this.isDead = true;
+                        this.createImpactParticles();
+                        if (this.weapon.id === 'grenade') {
+                            this.spawnGrenadeClusters();
+                        } else if (this.weapon.id === 'napalm_mortar') {
+                            this.spawnNapalmPools();
+                        }
                     }
                 });
 
-                mechs.forEach(m => {
-                    if (this.isDead || m === this.owner || m.isDead) return;
-                    if (m === this.owner?.droneOwner || (this.owner && this.owner === m.droneOwner)) return;
-                    const dist = Math.hypot(this.x - m.x, this.y - m.y);
-                    if (dist < 25) {
-                        if (this.weapon.splashRadius) {
-                            this.explode();
-                        } else {
-                            m.takeDamage(this.damage, this.owner, this.weapon.name);
+                if (this.weapon.id === 'moonlight' || this.weapon.id === 'saw_launcher') {
+                    mechs.forEach(mech => {
+                        if (mech !== this.owner && !mech.isDead && !this.hitTargets.has(mech.id)) {
+                            if (Math.hypot(this.x - mech.x, this.y - mech.y) < 38) {
+                                this.hitTargets.add(mech.id);
+                                mech.takeDamage(this.damage, this.owner, this.weapon.name);
+                                this.createImpactParticles();
+                            }
+                        }
+                    });
+                    return;
+                }
+
+                mechs.forEach(mech => {
+                    if (mech !== this.owner && !mech.isDead) {
+                        if (Math.hypot(this.x - mech.x, this.y - mech.y) < 22) {
+                            mech.takeDamage(this.damage, this.owner, this.weapon.name);
                             this.isDead = true;
-                            for (let i = 0; i < 5; i++) {
-                                particles.push({
-                                    x: this.x,
-                                    y: this.y,
-                                    vx: (Math.random() - 0.5) * 6,
-                                    vy: (Math.random() - 0.5) * 6,
-                                    life: 0.2,
-                                    maxLife: 0.2,
-                                    color: this.weapon.color,
-                                    size: 3
+                            this.createImpactParticles();
+
+                            if (this.weapon.id === 'seismic_cannon') {
+                                const knockAngle = Math.atan2(mech.y - this.y, mech.x - this.x);
+                                mech.x += Math.cos(knockAngle) * 75;
+                                mech.y += Math.sin(knockAngle) * 75;
+                            }
+
+                            if (this.weapon.id === 'chain_lightning') {
+                                mechs.forEach(chainMech => {
+                                    if (chainMech !== mech && chainMech !== this.owner && !chainMech.isDead) {
+                                        if (Math.hypot(mech.x - chainMech.x, mech.y - chainMech.y) < 220) {
+                                            chainMech.takeDamage(this.damage * 0.6, this.owner, `${this.weapon.name} CHAIN`);
+                                            for (let c = 0; c < 6; c++) {
+                                                particles.push({
+                                                    x: (mech.x + chainMech.x) / 2 + (Math.random() - 0.5) * 20,
+                                                    y: (mech.y + chainMech.y) / 2 + (Math.random() - 0.5) * 20,
+                                                    vx: (Math.random() - 0.5) * 4,
+                                                    vy: (Math.random() - 0.5) * 4,
+                                                    life: 0.25,
+                                                    maxLife: 0.25,
+                                                    color: '#06b6d4',
+                                                    size: 3
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+
+                            if (this.weapon.id === 'grenade') {
+                                this.spawnGrenadeClusters();
+                            } else if (this.weapon.id === 'napalm_mortar') {
+                                this.spawnNapalmPools();
+                            }
+
+                            if (this.weapon.splashRadius) {
+                                mechs.forEach(splashMech => {
+                                    if (splashMech !== mech && !splashMech.isDead) {
+                                        const d = Math.hypot(this.x - splashMech.x, this.y - splashMech.y);
+                                        if (d <= this.weapon.splashRadius) {
+                                            splashMech.takeDamage(this.damage * 0.5, this.owner, `${this.weapon.name} SPLASH`);
+                                        }
+                                    }
                                 });
                             }
                         }
@@ -2410,46 +2444,50 @@
                 });
             }
 
-            explode() {
-                this.isDead = true;
-                if (this.weapon.splashRadius) {
-                    audio.playExplosion();
-                    mechs.forEach(m => {
-                        if (!m.isDead) {
-                            const d = Math.hypot(m.x - this.x, m.y - this.y);
-                            if (d <= this.weapon.splashRadius) {
-                                const falloff = 1 - (d / this.weapon.splashRadius) * 0.5;
-                                m.takeDamage(this.damage * falloff, this.owner, this.weapon.name);
-                            }
-                        }
+            spawnGrenadeClusters() {
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i / 5) * Math.PI * 2;
+                    const subWeapon = {
+                        id: 'smg',
+                        name: 'CLUSTER BOMBLETS',
+                        damage: 70,
+                        speed: 8,
+                        range: 120,
+                        color: '#f97316'
+                    };
+                    projectiles.push(new Projectile(this.x, this.y, angle, subWeapon, this.owner));
+                }
+            }
+
+            spawnNapalmPools() {
+                for (let i = 0; i < 16; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = Math.random() * 70;
+                    particles.push({
+                        x: this.x + Math.cos(angle) * dist,
+                        y: this.y + Math.sin(angle) * dist,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        life: 0.8,
+                        maxLife: 0.8,
+                        color: Math.random() < 0.5 ? '#f59e0b' : '#ef4444',
+                        size: Math.random() * 8 + 4
                     });
-                    for (let i = 0; i < 20; i++) {
-                        const a = Math.random() * Math.PI * 2;
-                        const spd = Math.random() * 8 + 2;
-                        particles.push({
-                            x: this.x,
-                            y: this.y,
-                            vx: Math.cos(a) * spd,
-                            vy: Math.sin(a) * spd,
-                            life: 0.35,
-                            maxLife: 0.35,
-                            color: this.weapon.color,
-                            size: Math.random() * 5 + 3
-                        });
-                    }
-                } else {
-                    for (let i = 0; i < 6; i++) {
-                        particles.push({
-                            x: this.x,
-                            y: this.y,
-                            vx: (Math.random() - 0.5) * 4,
-                            vy: (Math.random() - 0.5) * 4,
-                            life: 0.15,
-                            maxLife: 0.15,
-                            color: this.weapon.color,
-                            size: 3
-                        });
-                    }
+                }
+            }
+
+            createImpactParticles() {
+                for (let i = 0; i < 8; i++) {
+                    particles.push({
+                        x: this.x,
+                        y: this.y,
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: (Math.random() - 0.5) * 6,
+                        life: 0.25,
+                        maxLife: 0.25,
+                        color: this.weapon.color || '#38bdf8',
+                        size: Math.random() * 4 + 2
+                    });
                 }
             }
 
@@ -2459,213 +2497,136 @@
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
 
-                ctx.fillStyle = this.weapon.color;
-                ctx.shadowColor = this.weapon.color;
+                ctx.fillStyle = this.weapon.color || '#38bdf8';
+                ctx.shadowColor = this.weapon.color || '#38bdf8';
                 ctx.shadowBlur = 8;
 
-                if (this.weapon.id === 'missile' || this.weapon.id === 'cluster_missile') {
-                    ctx.fillRect(-8, -3, 16, 6);
+                if (this.weapon.id === 'moonlight') {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 18, -Math.PI / 3, Math.PI / 3, false);
+                    ctx.lineWidth = 4;
+                    ctx.strokeStyle = this.weapon.color;
+                    ctx.stroke();
                 } else if (this.weapon.id === 'saw_launcher') {
                     ctx.beginPath();
                     ctx.arc(0, 0, 10, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
-                    ctx.fillRect(-10, -2, 20, 4);
+                    ctx.fillRect(-8, -2, 16, 4);
                 }
 
                 ctx.restore();
             }
         }
 
-        function addKillFeed(msg) {
-            const feed = document.getElementById('hud-kill-feed');
-            if (!feed) return;
-            const item = document.createElement('div');
-            item.className = 'bg-slate-900/90 border border-slate-700/80 text-white px-2.5 py-1 rounded shadow backdrop-blur-md transition-all duration-300';
-            item.textContent = msg;
-            feed.prepend(item);
-            if (feed.children.length > 5) {
-                feed.removeChild(feed.lastChild);
-            }
-            setTimeout(() => {
-                if (item.parentNode) {
-                    item.parentNode.removeChild(item);
-                }
-            }, 4500);
-        }
-
-        function checkMatchEndCondition() {
-            if (!isGameActive || !playerMech) return;
-            const aliveMechs = mechs.filter(m => !m.isDead && !m.isDrone);
-            if (playerMech.isDead) {
-                endGame(false);
-            } else if (aliveMechs.length <= 1) {
-                endGame(true);
-            }
-        }
-
-        function endGame(isVictory) {
-            isGameActive = false;
-            const summaryScreen = document.getElementById('summary-screen');
-            const summaryTitle = document.getElementById('summary-title');
-            const summarySubtitle = document.getElementById('summary-subtitle');
-            const summaryRank = document.getElementById('summary-rank');
-            const summaryKills = document.getElementById('summary-kills');
-            const summaryDmg = document.getElementById('summary-dmg');
-            const summaryPayout = document.getElementById('summary-payout');
-            const rankIcon = document.getElementById('summary-rank-icon');
-
-            const totalBots = 12;
-            const aliveCount = mechs.filter(m => !m.isDead && !m.isDrone).length;
-            const finalRank = playerMech.isDead ? aliveCount + 1 : 1;
-
-            let bounty = (13 - finalRank) * 200 + playerMech.kills * 250;
-            if (isVictory) bounty += 1000;
-
-            playerState.credits += bounty;
-            savePlayerState();
-
-            if (isVictory) {
-                summaryTitle.textContent = "VICTORY - RAVEN SURVIVED";
-                summaryTitle.className = "font-orbitron text-2xl md:text-3xl font-black text-amber-400 text-glow-amber";
-                summarySubtitle.textContent = "All enemy mechs neutralized in the zone";
-                rankIcon.innerHTML = `<i class="fa-solid fa-trophy"></i>`;
-            } else {
-                summaryTitle.textContent = "CRITICAL FAILURE - MECH DESTROYED";
-                summaryTitle.className = "font-orbitron text-2xl md:text-3xl font-black text-rose-500 text-glow-red";
-                summarySubtitle.textContent = "Ejection pod deployed safely to hangar";
-                rankIcon.innerHTML = `<i class="fa-solid fa-skull"></i>`;
-            }
-
-            summaryRank.textContent = `#${finalRank} / ${totalBots}`;
-            summaryKills.textContent = playerMech.kills;
-            summaryDmg.textContent = Math.round(playerMech.damageDealt);
-            summaryPayout.textContent = `+${bounty.toLocaleString()} C`;
-
-            summaryScreen.classList.remove('hidden');
-        }
-
-        window.returnToHangar = function() {
-            document.getElementById('summary-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('garage-screen').classList.remove('hidden');
-            renderGarageUI();
-        };
-
         // ==========================================
-        // FIXED AIM & TOUCH/MOUSE CONTROLS SYSTEM
+        // 2. AIMING SYSTEM FIX & MOUSE/TOUCH LOGIC
         // ==========================================
 
-        function updatePointerPos(e) {
+        function updateMousePos(e) {
             if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
-            let clientX, clientY;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            let clientX = e.clientX;
+            let clientY = e.clientY;
 
             if (e.touches && e.touches.length > 0) {
                 clientX = e.touches[0].clientX;
                 clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
+            } else if (e.changedTouches && e.changedTouches.length > 0) {
+                clientX = e.changedTouches[0].clientX;
+                clientY = e.changedTouches[0].clientY;
             }
 
-            if (clientX === undefined || clientY === undefined) return;
+            mouseX = (clientX - rect.left) * scaleX;
+            mouseY = (clientY - rect.top) * scaleY;
 
-            mouseX = clientX - rect.left;
-            mouseY = clientY - rect.top;
+            recalculateWorldMouse();
+        }
 
+        function recalculateWorldMouse() {
             if (playerMech) {
                 const cameraX = playerMech.x - canvas.width / 2;
                 const cameraY = playerMech.y - canvas.height / 2;
                 mouseWorldX = mouseX + cameraX;
                 mouseWorldY = mouseY + cameraY;
+            } else {
+                mouseWorldX = mouseX;
+                mouseWorldY = mouseY;
             }
         }
 
-        function initControls() {
-            window.addEventListener('keydown', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w') keys.w = true;
-                if (k === 'a') keys.a = true;
-                if (k === 's') keys.s = true;
-                if (k === 'd') keys.d = true;
-                if (k === ' ') keys.space = true;
-                if (k === 'e') keys.e = true;
+        // ==========================================
+        // 3. GAME ENGINE & MATCH FLOW
+        // ==========================================
 
-                if (['1', '2', '3', '4'].includes(k)) {
-                    if (playerMech) {
-                        playerMech.activeSlotIndex = parseInt(k) - 1;
-                    }
-                }
-            });
+        function addKillFeed(msg) {
+            const container = document.getElementById('hud-kill-feed');
+            const item = document.createElement('div');
+            item.className = 'bg-slate-900/90 border border-slate-700 text-slate-200 px-2.5 py-1 rounded shadow text-[10px] uppercase font-bold animate-pulse';
+            item.textContent = msg;
+            container.appendChild(item);
 
-            window.addEventListener('keyup', (e) => {
-                const k = e.key.toLowerCase();
-                if (k === 'w') keys.w = false;
-                if (k === 'a') keys.a = false;
-                if (k === 's') keys.s = false;
-                if (k === 'd') keys.d = false;
-                if (k === ' ') keys.space = false;
-                if (k === 'e') keys.e = false;
-            });
+            setTimeout(() => {
+                if (item.parentNode) item.parentNode.removeChild(item);
+            }, 4000);
+        }
 
-            // Pointer & Touch Aiming Event Listeners
-            window.addEventListener('mousemove', (e) => updatePointerPos(e));
-            
-            canvas.addEventListener('mousedown', (e) => {
-                isMouseDown = true;
-                audio.init();
-                updatePointerPos(e);
-            });
-
-            window.addEventListener('mouseup', () => {
-                isMouseDown = false;
-            });
-
-            canvas.addEventListener('touchstart', (e) => {
-                isMouseDown = true;
-                audio.init();
-                updatePointerPos(e);
-            }, { passive: true });
-
-            canvas.addEventListener('touchmove', (e) => {
-                updatePointerPos(e);
-            }, { passive: true });
-
-            window.addEventListener('touchend', () => {
-                isMouseDown = false;
-            });
-
-            window.addEventListener('touchcancel', () => {
-                isMouseDown = false;
-            });
-
-            const dashBtn = document.getElementById('btn-dash');
-            if (dashBtn) {
-                dashBtn.addEventListener('touchstart', (e) => {
-                    e.stopPropagation();
-                    keys.space = true;
-                });
-                dashBtn.addEventListener('touchend', (e) => {
-                    e.stopPropagation();
-                    keys.space = false;
-                });
-                dashBtn.addEventListener('mousedown', () => keys.space = true);
-                dashBtn.addEventListener('mouseup', () => keys.space = false);
-            }
-
-            const abilityBtn = document.getElementById('btn-ability');
-            if (abilityBtn) {
-                abilityBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (playerMech) playerMech.useCoreAbility();
-                });
+        function checkMatchEndCondition() {
+            const aliveMechs = mechs.filter(m => !m.isDead && !m.isDrone);
+            if (playerMech.isDead || aliveMechs.length <= 1) {
+                setTimeout(showMatchSummary, 1200);
             }
         }
 
-        window.startGame = function() {
+        function showMatchSummary() {
+            isGameActive = false;
+            cancelAnimationFrame(animationFrameId);
+
+            const aliveMechs = mechs.filter(m => !m.isDead && !m.isDrone);
+            const rank = playerMech.isDead ? aliveMechs.length + 1 : 1;
+            const kills = playerMech.kills;
+            const dmg = Math.round(playerMech.damageDealt);
+
+            let bounty = (13 - rank) * 200 + kills * 350 + Math.round(dmg / 10);
+            if (rank === 1) bounty += 1000;
+
+            playerState.credits += bounty;
+            savePlayerState();
+
+            document.getElementById('summary-rank').textContent = `#${rank} / 12`;
+            document.getElementById('summary-kills').textContent = kills;
+            document.getElementById('summary-dmg').textContent = dmg.toLocaleString();
+            document.getElementById('summary-payout').textContent = `+${bounty.toLocaleString()} C`;
+
+            const title = document.getElementById('summary-title');
+            const subtitle = document.getElementById('summary-subtitle');
+            const icon = document.getElementById('summary-rank-icon');
+
+            if (rank === 1) {
+                title.textContent = "VICTORY - RAVEN SURVIVED";
+                title.className = "font-orbitron text-2xl md:text-3xl font-black text-amber-400 text-glow-amber";
+                subtitle.textContent = "All enemy mechs neutralized in the arena";
+                icon.className = "w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 text-3xl mt-2 glow-amber";
+                icon.innerHTML = '<i class="fa-solid fa-trophy"></i>';
+            } else {
+                title.textContent = "CRITICAL FAILURE - MECH DESTROYED";
+                title.className = "font-orbitron text-2xl md:text-3xl font-black text-rose-500 text-glow-red";
+                subtitle.textContent = "Ejected prior to core meltdown";
+                icon.className = "w-16 h-16 rounded-full bg-rose-500/20 border-2 border-rose-500 flex items-center justify-center text-rose-500 text-3xl mt-2 glow-red";
+                icon.innerHTML = '<i class="fa-solid fa-skull"></i>';
+            }
+
+            document.getElementById('summary-screen').classList.remove('hidden');
+        }
+
+        function startMatch() {
             audio.init();
+
             document.getElementById('garage-screen').classList.add('hidden');
+            document.getElementById('summary-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
             canvas = document.getElementById('gameCanvas');
@@ -2673,138 +2634,296 @@
             minimapCanvas = document.getElementById('minimapCanvas');
             minimapCtx = minimapCanvas.getContext('2d');
 
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            resizeCanvas();
 
-            mechs = [];
-            projectiles = [];
-            particles = [];
+            generateObstacles();
+
+            safeZone.x = WORLD_SIZE / 2;
+            safeZone.y = WORLD_SIZE / 2;
+            safeZone.radius = 1300;
+            safeZone.targetRadius = 1300;
+            safeZone.timer = 20;
+
             healthBoxes = [];
             supplyDrops = [];
             nukeZones = [];
             orbitalZones = [];
-            heavensWrathZones = [];
+            projectiles = [];
+            particles = [];
+            mechs = [];
 
-            generateObstacles();
-
-            const startX = WORLD_SIZE / 2;
-            const startY = WORLD_SIZE / 2;
-            playerMech = new Mech(startX, startY, true, "RAVEN", playerState.cosmetics.secondaryColor);
+            playerMech = new Mech(WORLD_SIZE / 2 + (Math.random() - 0.5) * 400, WORLD_SIZE / 2 + (Math.random() - 0.5) * 400, true, "RAVEN (YOU)");
             mechs.push(playerMech);
 
-            const botNames = ["V.IV RUSTY", "MICHIGAN", "IGUAZU", "SNAIL", "CHATTY", "CARLA", "VOLT", "O'KEEFFE", "SLIN", "SWINBURNE", "FREEDA"];
-            const colors = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899", "#f43f5e", "#06b6d4", "#a855f7", "#cbd5e1", "#eab308"];
+            const botNames = ["V.IV RUSTY", "MICHIGAN", "SNAIL", "IGUAZU", "VOLTA", "FREEDA", "CHATTY", "CARLA", "O'KEEFFE", "SWINBURNE", "RING FREDDIE"];
+            const colors = ['#f43f5e', '#ec4899', '#a855f7', '#6366f1', '#3b82f6', '#14b8a6', '#84cc16', '#eab308', '#f97316', '#ef4444', '#06b6d4'];
 
             for (let i = 0; i < 11; i++) {
                 const angle = (i / 11) * Math.PI * 2;
-                const dist = 600 + Math.random() * 500;
-                const bx = startX + Math.cos(angle) * dist;
-                const by = startY + Math.sin(angle) * dist;
-                mechs.push(new Mech(bx, by, false, botNames[i], colors[i]));
+                const dist = Math.random() * 800 + 300;
+                const bx = WORLD_SIZE / 2 + Math.cos(angle) * dist;
+                const by = WORLD_SIZE / 2 + Math.sin(angle) * dist;
+                mechs.push(new Mech(bx, by, false, botNames[i], colors[i % colors.length]));
             }
 
-            safeZone.radius = 1300;
-            safeZone.targetRadius = 1300;
-            safeZone.x = WORLD_SIZE / 2;
-            safeZone.y = WORLD_SIZE / 2;
+            for (let i = 0; i < 5; i++) {
+                spawnHealthBox();
+            }
 
-            isGameActive = true;
             gameTime = 0;
+            healthSpawnTimer = 0;
+            supplyDropTimer = 0;
+            isGameActive = true;
 
-            initControls();
-            requestAnimationFrame(gameLoop);
-        };
+            lastTimestamp = performance.now();
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
 
         let lastTimestamp = 0;
+
         function gameLoop(timestamp) {
             if (!isGameActive) return;
 
-            const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000 || 0.016);
+            const dt = Math.min(0.05, (timestamp - lastTimestamp) / 1000);
             lastTimestamp = timestamp;
+
             gameTime += dt;
+            healthSpawnTimer += dt;
+            supplyDropTimer += dt;
 
-            // Recalculate pointer in world space
-            if (playerMech) {
-                const cameraX = playerMech.x - canvas.width / 2;
-                const cameraY = playerMech.y - canvas.height / 2;
-                mouseWorldX = mouseX + cameraX;
-                mouseWorldY = mouseY + cameraY;
-
-                // Fire weapon continuous tap/click
-                if (isMouseDown && !playerMech.isDead) {
-                    playerMech.fireCurrentWeapon();
-                }
+            if (healthSpawnTimer >= 12) {
+                healthSpawnTimer = 0;
+                spawnHealthBox();
             }
 
-            // Update Entities
+            if (supplyDropTimer >= 22) {
+                supplyDropTimer = 0;
+                triggerSupplyDrop();
+            }
+
+            safeZone.timer -= dt;
+            if (safeZone.timer <= 0) {
+                safeZone.timer = 25;
+                safeZone.targetRadius = Math.max(200, safeZone.targetRadius - 250);
+            }
+            if (safeZone.radius > safeZone.targetRadius) {
+                safeZone.radius -= safeZone.shrinkSpeed * 60 * dt;
+            }
+
+            recalculateWorldMouse();
+
+            if (isMouseDown && playerMech && !playerMech.isDead) {
+                playerMech.fireCurrentWeapon();
+            }
+
             mechs.forEach(m => m.update(dt));
+
             projectiles.forEach(p => p.update(dt));
+            projectiles = projectiles.filter(p => !p.isDead);
+
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
                 p.life -= dt;
             });
-            healthBoxes.forEach(h => h.update(dt));
-            supplyDrops.forEach(s => s.update(dt));
-
-            // Clean up dead objects
-            projectiles = projectiles.filter(p => !p.isDead);
             particles = particles.filter(p => p.life > 0);
 
-            // Safe Zone Shrink logic
-            if (safeZone.radius > 250) {
-                safeZone.radius -= safeZone.shrinkSpeed * dt * 25;
-            }
+            healthBoxes.forEach(hb => {
+                hb.update(dt);
+                if (!hb.isCollected) {
+                    mechs.forEach(m => {
+                        if (!m.isDead && Math.hypot(m.x - hb.x, m.y - hb.y) < m.speed + hb.radius + 10) {
+                            hb.isCollected = true;
+                            m.ap = Math.min(m.maxAp, m.ap + hb.healAmount);
+                            if (m.isPlayer) audio.playHeal();
+                        }
+                    });
+                }
+            });
 
-            // Draw Scene
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            supplyDrops.forEach(sd => {
+                sd.update(dt);
+                if (sd.landed && !sd.isCollected) {
+                    mechs.forEach(m => {
+                        if (!m.isDead && Math.hypot(m.x - sd.x, m.y - sd.y) < m.speed + sd.radius + 10) {
+                            sd.isCollected = true;
+                            m.ap = m.maxAp;
+                            m.en = m.maxEn;
+                            if (m.isPlayer) {
+                                audio.playHeal();
+                                addKillFeed("FULL REPAIR & ENERGY RECHARGE ACQUIRED!");
+                            }
+                        }
+                    });
+                }
+            });
 
-            const camX = playerMech ? playerMech.x - canvas.width / 2 : 0;
-            const camY = playerMech ? playerMech.y - canvas.height / 2 : 0;
+            nukeZones.forEach(nz => {
+                nz.timer -= dt;
+                if (nz.timer <= 0 && !nz.exploded) {
+                    nz.exploded = true;
+                    audio.playExplosion();
+                    mechs.forEach(m => {
+                        if (!m.isDead && Math.hypot(m.x - nz.x, m.y - nz.y) <= nz.radius) {
+                            m.takeDamage(nz.damage, nz.owner, "NUCLEAR BLAST");
+                        }
+                    });
+                    for (let i = 0; i < 60; i++) {
+                        const a = Math.random() * Math.PI * 2;
+                        const r = Math.random() * nz.radius;
+                        particles.push({
+                            x: nz.x + Math.cos(a) * r,
+                            y: nz.y + Math.sin(a) * r,
+                            vx: (Math.random() - 0.5) * 12,
+                            vy: (Math.random() - 0.5) * 12,
+                            life: 0.8,
+                            maxLife: 0.8,
+                            color: Math.random() < 0.5 ? '#ef4444' : '#f59e0b',
+                            size: Math.random() * 8 + 4
+                        });
+                    }
+                }
+            });
+            nukeZones = nukeZones.filter(nz => !nz.exploded);
+
+            orbitalZones.forEach(oz => {
+                oz.duration -= dt;
+                oz.strikeTimer -= dt;
+                if (oz.strikeTimer <= 0 && oz.duration > 0) {
+                    oz.strikeTimer = 0.2;
+                    const rx = oz.x + (Math.random() - 0.5) * oz.radius;
+                    const ry = oz.y + (Math.random() - 0.5) * oz.radius;
+                    audio.playPew(800, 0.05, 'sawtooth');
+                    mechs.forEach(m => {
+                        if (!m.isDead && Math.hypot(m.x - rx, m.y - ry) <= 45) {
+                            m.takeDamage(oz.damage, oz.owner, "ORBITAL STRIKE");
+                        }
+                    });
+                    for (let i = 0; i < 10; i++) {
+                        particles.push({
+                            x: rx,
+                            y: ry,
+                            vx: (Math.random() - 0.5) * 8,
+                            vy: (Math.random() - 0.5) * 8,
+                            life: 0.3,
+                            maxLife: 0.3,
+                            color: '#f59e0b',
+                            size: 4
+                        });
+                    }
+                }
+            });
+            orbitalZones = orbitalZones.filter(oz => oz.duration > 0);
+
+            obstacles.forEach(obs => {
+                if (obs.isHolo) {
+                    obs.lifeTimer -= dt;
+                }
+            });
+            obstacles = obstacles.filter(obs => !obs.isHolo || obs.lifeTimer > 0);
+
+            renderGame();
+            updateHUD();
+
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function renderGame() {
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.save();
-            ctx.translate(-camX, -camY);
+            const cameraX = playerMech.x - canvas.width / 2;
+            const cameraY = playerMech.y - canvas.height / 2;
+            ctx.translate(-cameraX, -cameraY);
 
-            // Draw Background Grid
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.strokeStyle = 'rgba(30, 41, 59, 0.5)';
             ctx.lineWidth = 1;
-            const gridSize = 60;
-            const startGridX = Math.floor(camX / gridSize) * gridSize;
-            const startGridY = Math.floor(camY / gridSize) * gridSize;
-            for (let x = startGridX; x < startGridX + canvas.width + gridSize; x += gridSize) {
-                ctx.beginPath(); ctx.moveTo(x, camY); ctx.lineTo(x, camY + canvas.height); ctx.stroke();
+            const gridSize = 100;
+            const startX = Math.floor(cameraX / gridSize) * gridSize;
+            const endX = startX + canvas.width + gridSize;
+            const startY = Math.floor(cameraY / gridSize) * gridSize;
+            const endY = startY + canvas.height + gridSize;
+
+            for (let x = startX; x < endX; x += gridSize) {
+                ctx.beginPath(); ctx.moveTo(x, startY); ctx.lineTo(x, endY); ctx.stroke();
             }
-            for (let y = startGridY; y < startGridY + canvas.height + gridSize; y += gridSize) {
-                ctx.beginPath(); ctx.moveTo(camX, y); ctx.lineTo(camX + canvas.width, y); ctx.stroke();
+            for (let y = startY; y < endY; y += gridSize) {
+                ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
             }
 
-            // Draw Safe Zone Boundary
-            ctx.strokeStyle = '#f59e0b';
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
+
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
+            ctx.fillStyle = 'rgba(239, 68, 68, 0.08)';
             ctx.lineWidth = 4;
-            ctx.setLineDash([12, 8]);
             ctx.beginPath();
             ctx.arc(safeZone.x, safeZone.y, safeZone.radius, 0, Math.PI * 2);
+            ctx.fill();
             ctx.stroke();
-            ctx.setLineDash([]);
 
-            // Draw Obstacles
-            obstacles.forEach(obs => {
-                ctx.fillStyle = obs.isHolo ? 'rgba(45, 212, 191, 0.3)' : '#1e293b';
-                ctx.strokeStyle = obs.isHolo ? '#2dd4bf' : '#475569';
-                ctx.lineWidth = 3;
+            nukeZones.forEach(nz => {
+                ctx.strokeStyle = '#ef4444';
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
+                ctx.arc(nz.x, nz.y, nz.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 12px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.fillText(`NUKE IMPACT IN ${nz.timer.toFixed(1)}s`, nz.x, nz.y);
+            });
+
+            orbitalZones.forEach(oz => {
+                ctx.strokeStyle = '#f59e0b';
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(oz.x, oz.y, oz.radius, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
             });
 
-            // Draw Health Boxes & Supply Drops
-            healthBoxes.forEach(h => h.draw(ctx));
-            supplyDrops.forEach(s => s.draw(ctx));
+            obstacles.forEach(obs => {
+                ctx.save();
+                ctx.translate(obs.x, obs.y);
+                if (obs.isHolo) {
+                    ctx.strokeStyle = obs.color || '#2dd4bf';
+                    ctx.fillStyle = 'rgba(45, 212, 191, 0.25)';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, obs.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.fillStyle = '#1e293b';
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, obs.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+                ctx.restore();
+            });
 
-            // Draw Mechs, Projectiles & Particles
+            healthBoxes.forEach(hb => hb.draw(ctx));
+            supplyDrops.forEach(sd => sd.draw(ctx));
+
             mechs.forEach(m => m.draw(ctx));
             projectiles.forEach(p => p.draw(ctx));
+
             particles.forEach(p => {
                 ctx.fillStyle = p.color;
                 ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
@@ -2815,85 +2934,179 @@
             });
 
             ctx.restore();
-
-            // Render Minimap
-            drawMinimap();
-
-            // Update HUD text & status
-            renderHUD();
-
-            requestAnimationFrame(gameLoop);
         }
 
-        function drawMinimap() {
-            if (!minimapCtx || !playerMech) return;
-            minimapCtx.clearRect(0, 0, 110, 110);
-            minimapCtx.fillStyle = '#020617';
-            minimapCtx.fillRect(0, 0, 110, 110);
-
-            const scale = 110 / WORLD_SIZE;
-
-            // Safe Zone on Minimap
-            minimapCtx.strokeStyle = '#f59e0b';
-            minimapCtx.lineWidth = 1;
-            minimapCtx.beginPath();
-            minimapCtx.arc(safeZone.x * scale, safeZone.y * scale, safeZone.radius * scale, 0, Math.PI * 2);
-            minimapCtx.stroke();
-
-            // Mechs on Minimap
-            mechs.forEach(m => {
-                if (m.isDead) return;
-                minimapCtx.fillStyle = m.isPlayer ? '#06b6d4' : '#ef4444';
-                minimapCtx.beginPath();
-                minimapCtx.arc(m.x * scale, m.y * scale, m.isPlayer ? 3.5 : 2, 0, Math.PI * 2);
-                minimapCtx.fill();
-            });
-        }
-
-        function renderHUD() {
-            if (!playerMech) return;
-
-            document.getElementById('hud-alive-count').textContent = mechs.filter(m => !m.isDead && !m.isDrone).length;
+        function updateHUD() {
+            const aliveCount = mechs.filter(m => !m.isDead && !m.isDrone).length;
+            document.getElementById('hud-alive-count').textContent = aliveCount;
             document.getElementById('hud-kill-count').textContent = playerMech.kills;
 
             document.getElementById('hud-ap-text').textContent = `${Math.max(0, Math.round(playerMech.ap))} / ${playerMech.maxAp}`;
             document.getElementById('hud-ap-bar').style.width = `${Math.max(0, (playerMech.ap / playerMech.maxAp) * 100)}%`;
 
-            document.getElementById('hud-en-text').textContent = `${Math.round(playerMech.en)}%`;
-            document.getElementById('hud-en-bar').style.width = `${Math.max(0, playerMech.en)}%`;
+            document.getElementById('hud-en-text').textContent = `${Math.round((playerMech.en / playerMech.maxEn) * 100)}%`;
+            document.getElementById('hud-en-bar').style.width = `${Math.max(0, (playerMech.en / playerMech.maxEn) * 100)}%`;
 
-            const weaponContainer = document.getElementById('hud-weapon-slots');
-            weaponContainer.innerHTML = '';
+            const zoneWarning = document.getElementById('hud-zone-warning');
+            const zoneTimerText = document.getElementById('hud-zone-timer');
+            if (safeZone.timer <= 10) {
+                zoneWarning.classList.remove('hidden');
+                zoneTimerText.textContent = `ZONE SHRINKING IN ${Math.ceil(safeZone.timer)}s`;
+            } else {
+                zoneWarning.classList.add('hidden');
+            }
+
+            const abilityBtn = document.getElementById('btn-ability');
+            const abilityStatus = document.getElementById('hud-ability-status');
+            if (playerMech.abilityCooldownTimer > 0) {
+                abilityStatus.textContent = `${Math.ceil(playerMech.abilityCooldownTimer)}s`;
+                abilityStatus.className = "text-[9px] text-amber-400 font-extrabold";
+            } else {
+                abilityStatus.textContent = "READY";
+                abilityStatus.className = "text-[9px] text-emerald-400 font-extrabold";
+            }
+
+            const slotsContainer = document.getElementById('hud-weapon-slots');
+            slotsContainer.innerHTML = '';
             playerMech.equippedSlots.forEach((wId, idx) => {
                 const weapon = WEAPONS_CATALOG[wId] || WEAPONS_CATALOG['rifle'];
                 const isActive = playerMech.activeSlotIndex === idx;
                 const cd = playerMech.slotCooldowns[idx];
 
                 const btn = document.createElement('button');
-                btn.onclick = () => playerMech.activeSlotIndex = idx;
-                btn.className = `px-3 py-2 rounded-xl border flex flex-col items-center min-w-[70px] transition-all ${
-                    isActive ? 'bg-cyan-500/20 border-cyan-400 text-white glow-cyan' : 'bg-slate-900/90 border-slate-800 text-slate-400'
+                btn.onclick = () => { playerMech.activeSlotIndex = idx; };
+                btn.className = `px-3 py-2 rounded-xl border backdrop-blur-md flex flex-col items-center min-w-[70px] transition-all ${
+                    isActive ? 'bg-cyan-500/20 border-cyan-400 text-white glow-cyan' : 'bg-slate-900/90 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`;
                 btn.innerHTML = `
-                    <div class="text-[10px] font-orbitron font-bold text-cyan-400">SLOT ${idx + 1}</div>
-                    <i class="fa-solid ${weapon.icon} text-sm my-0.5"></i>
-                    <div class="text-[9px] font-extrabold ${cd > 0 ? 'text-amber-400' : 'text-emerald-400'}">${cd > 0 ? `${cd.toFixed(1)}s` : 'READY'}</div>
+                    <span class="text-[9px] font-orbitron font-bold text-slate-400">KEY ${idx + 1}</span>
+                    <i class="fa-solid ${weapon.icon} my-0.5 text-xs ${isActive ? 'text-cyan-400' : 'text-slate-400'}"></i>
+                    <span class="text-[10px] font-extrabold">${weapon.name.split(' ')[0]}</span>
+                    ${cd > 0 ? `<span class="text-[8px] text-amber-400 font-bold">${cd.toFixed(1)}s</span>` : ''}
                 `;
-                weaponContainer.appendChild(btn);
+                slotsContainer.appendChild(btn);
+            });
+
+            renderMinimap();
+        }
+
+        function renderMinimap() {
+            if (!minimapCtx) return;
+            minimapCtx.clearRect(0, 0, 110, 110);
+
+            const scale = 110 / WORLD_SIZE;
+
+            minimapCtx.strokeStyle = 'rgba(239, 68, 68, 0.8)';
+            minimapCtx.lineWidth = 1.5;
+            minimapCtx.beginPath();
+            minimapCtx.arc(safeZone.x * scale, safeZone.y * scale, safeZone.radius * scale, 0, Math.PI * 2);
+            minimapCtx.stroke();
+
+            mechs.forEach(m => {
+                if (m.isDead) return;
+                minimapCtx.fillStyle = m.isPlayer ? '#06b6d4' : (m.isDrone ? '#38bdf8' : '#f43f5e');
+                minimapCtx.beginPath();
+                minimapCtx.arc(m.x * scale, m.y * scale, m.isPlayer ? 3.5 : 2, 0, Math.PI * 2);
+                minimapCtx.fill();
             });
         }
 
-        window.addEventListener('resize', () => {
-            if (canvas) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+        // ==========================================
+        // 4. EVENT LISTENERS & INITIALIZATION
+        // ==========================================
+
+        window.addEventListener('resize', resizeCanvas);
+
+        window.addEventListener('keydown', (e) => {
+            if (!isGameActive) return;
+            const k = e.key.toLowerCase();
+            if (k === 'w') keys.w = true;
+            if (k === 'a') keys.a = true;
+            if (k === 's') keys.s = true;
+            if (k === 'd') keys.d = true;
+            if (k === ' ') keys.space = true;
+            if (k === 'e') keys.e = true;
+
+            if (['1', '2', '3', '4'].includes(k)) {
+                const idx = parseInt(k) - 1;
+                if (playerMech) playerMech.activeSlotIndex = idx;
             }
         });
 
-        window.onload = function() {
+        window.addEventListener('keyup', (e) => {
+            if (!isGameActive) return;
+            const k = e.key.toLowerCase();
+            if (k === 'w') keys.w = false;
+            if (k === 'a') keys.a = false;
+            if (k === 's') keys.s = false;
+            if (k === 'd') keys.d = false;
+            if (k === ' ') keys.space = false;
+            if (k === 'e') keys.e = false;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isGameActive) updateMousePos(e);
+        });
+
+        window.addEventListener('mousedown', (e) => {
+            if (isGameActive && e.target.id === 'gameCanvas') {
+                isMouseDown = true;
+                updateMousePos(e);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isMouseDown = false;
+        });
+
+        window.addEventListener('touchstart', (e) => {
+            if (isGameActive && e.target.id === 'gameCanvas') {
+                isMouseDown = true;
+                updateMousePos(e);
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (isGameActive && e.target.id === 'gameCanvas') {
+                updateMousePos(e);
+            }
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            isMouseDown = false;
+        });
+
+        document.getElementById('btn-deploy').addEventListener('click', () => {
+            startMatch();
+        });
+
+        document.getElementById('btn-return-hangar').addEventListener('click', () => {
+            document.getElementById('summary-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('garage-screen').classList.remove('hidden');
+            renderGarageUI();
+        });
+
+        document.getElementById('btn-ability').addEventListener('click', () => {
+            if (playerMech && !playerMech.isDead) {
+                playerMech.useCoreAbility();
+            }
+        });
+
+        document.getElementById('btn-dash').addEventListener('click', () => {
+            if (playerMech && !playerMech.isDead && playerMech.en > 15) {
+                playerMech.isBoosting = true;
+                audio.playBoost();
+                setTimeout(() => {
+                    if (playerMech) playerMech.isBoosting = false;
+                }, 300);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
             loadPlayerState();
             renderGarageUI();
-        };
+        });
     </script>
 </body>
 </html>
